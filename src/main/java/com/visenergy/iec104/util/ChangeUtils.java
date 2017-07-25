@@ -1,0 +1,119 @@
+package com.visenergy.iec104.util;
+
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
+/**
+ * Created by Administrator on 2017/5/8 0008.
+ */
+public class ChangeUtils {
+    private static final char[] HEX_CHAR_TABLE = {
+            '0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'
+    };
+
+    public static String toHexString(Byte[] data){
+        byte[] resultBytes = new byte[data.length];
+        for(int i =0 ;i<data.length;i++){
+            resultBytes[i] = data[i];
+        }
+        return toHexString(resultBytes);
+    }
+
+    public static String toHexString(byte[] data){
+        if(data == null || data.length == 0)
+            return null;
+        byte[] hex = new byte[data.length * 2];
+        int index = 0;
+        for(byte b : data){
+            int v = b & 0xFF;
+            hex[index++] = (byte) HEX_CHAR_TABLE[v >>> 4];
+            hex[index++] = (byte) HEX_CHAR_TABLE[v & 0xF];
+        }
+        return new String(hex);
+    }
+
+    public static byte[] hexStringToBytes(String data){
+        if(data == null || "".equals(data))
+            return null;
+        data = data.toUpperCase();
+        int length = data.length()/2;
+        char[] dataChars = data.toCharArray();
+        byte[] byteData = new byte[length];
+        for (int i = 0;i<length;i++){
+            int pos = i * 2;
+            byteData[i] = (byte)(charToByte(dataChars[pos]) << 4 | charToByte(dataChars[pos + 1]));
+        }
+        return byteData;
+    }
+
+    public static byte charToByte(char c){
+        return (byte)"0123456789ABCDEF".indexOf(c);
+    }
+
+    public static String byteAppend(byte[] bytes){
+        StringBuffer stringBuffer = new StringBuffer();
+        for (int i=bytes.length-1;i>=0;i--){
+            stringBuffer.append(String.format("%02d",bytes[i]));
+        }
+        return stringBuffer.toString();
+    }
+
+    private static int startSendNum  =  1;
+
+    public static void main(String[] args) {
+       /* Runnable runnable = new Runnable() {
+            public void run() {
+                try {
+                    byte[] recNum = new byte[2];
+                    recNum[0] = (byte) (startSendNum << 1);
+                    recNum[1] = (byte) (startSendNum >> 7);
+                    String recStr = Utils.toHexString(recNum);
+                    System.out.println("******************"+ recStr);
+                    startSendNum++;
+                    System.out.println("******************"+ startSendNum);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
+        // 第二个参数为首次执行的延时时间，第三个参数为定时执行的间隔时间
+        service.scheduleAtFixedRate(runnable, 0, 10, TimeUnit.SECONDS);*/
+
+        Calendar calendar=new GregorianCalendar();
+        int year = Integer.parseInt(String.valueOf(calendar.get(Calendar.YEAR)).substring(2));
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DATE);
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
+        int second = calendar.get(Calendar.SECOND);
+        int milliSecond = calendar.get(Calendar.MILLISECOND);
+        int handleS = second * 1000 + milliSecond;
+
+        String yearStr = Integer.toHexString(year);
+        yearStr = yearStr.length() > 1?yearStr:"0".concat(yearStr);
+        String monthStr = Integer.toHexString(month);
+        monthStr = monthStr.length() > 1?monthStr:"0".concat(monthStr);
+        String dayStr = Integer.toHexString(day);
+        dayStr = dayStr.length() > 1?dayStr:"0".concat(dayStr);
+        String hourStr = Integer.toHexString(hour);
+        hourStr = hourStr.length() > 1?hourStr:"0".concat(hourStr);
+        String minuteStr = Integer.toHexString(minute);
+        minuteStr = minuteStr.length() > 1?minuteStr:"0".concat(minuteStr);
+        String handleSStr = Integer.toHexString(handleS);
+        if(handleSStr.length() == 1){
+            handleSStr = "000" + handleSStr;
+        }else if(handleSStr.length() == 2){
+            handleSStr = "00" + handleSStr;
+        }else if(handleSStr.length() == 3){
+            handleSStr = "0" + handleSStr;
+        }
+        handleSStr = handleSStr.substring(2) + handleSStr.substring(0,2);
+        System.out.println(yearStr);
+        System.out.println(monthStr);
+        System.out.println(dayStr);
+        System.out.println(hourStr);
+        System.out.println(minuteStr);
+        System.out.println(handleSStr);
+    }
+}
