@@ -92,14 +92,18 @@ public class Client {
                                       }else if((address/32 + 1) < 12){
                                           yxObjName = "NBQ0" + (address/32 + 1);
                                         }else{
-                                            //通讯状态
-                                            log.debug(Init.yxJsonObj.getJSONObject(address+"").get("description") + "未存储");
+                                          //通讯状态
+                                          log.debug(Init.yxJsonObj.getJSONObject(address + "").get("description") + "未存储");
+                                          for (Map.Entry<String, YxObject> entry : DataProcessPool.yxPool.entrySet()) {
+                                              log.debug("遥信对象 ：" + entry.getKey() + " ," + address + "执行方法：set" + yxObjJson.getString("name") + "值：" + ((IeSinglePointWithQuality) infoObjs[i].getInformationElements()[j][0]).isOn());
+                                              int flagInt = ((IeSinglePointWithQuality)infoObjs[i].getInformationElements()[j][0]).isOn() ? 1 : 0;
+                                              setByReflect(entry, yxObjJson.getString("name"), flagInt, yxObjJson.getString("type"));
+                                          }
                                         }
                                         if(yxObjName != null){
-                                            log.debug("遥信对象 ："+ yxObjName +" ,"+ address +"执行方法：set" + yxObjJson.getString("name") +"值：" + ((IeSinglePointWithQuality)infoObjs[i].getInformationElements()[j][0]).isOn());
-
-                                            int flagInt = ((IeSinglePointWithQuality)infoObjs[i].getInformationElements()[j][0]).isOn() ? 1 : 0;
-                                            setValue(1,yxObjName,"set" + yxObjJson.getString("name"),flagInt,yxObjJson.getString("type"));
+                                            log.debug("遥信对象 ：" + yxObjName + " ," + address + "执行方法：set" + yxObjJson.getString("name") + "值：" + ((IeSinglePointWithQuality) infoObjs[i].getInformationElements()[j][0]).isOn());
+                                            int flagInt = ((IeSinglePointWithQuality) infoObjs[i].getInformationElements()[j][0]).isOn() ? 1 : 0;
+                                            setValue(1, yxObjName, "set" + yxObjJson.getString("name"), flagInt, yxObjJson.getString("type"));
                                         }else{
                                             log.warn("遥信对象无名称！");
                                         }
@@ -207,6 +211,8 @@ public class Client {
             objMethod = obj.getClass().getMethod(methodName,double.class);
         }else if("int".equals(mt)){
             objMethod = obj.getClass().getMethod(methodName,int.class);
+        }else if("String".equals(mt)){
+            objMethod = obj.getClass().getMethod(methodName,String.class);
         }else{
             log.warn("不存在的方法类型，无法生成反射方法。");
         }

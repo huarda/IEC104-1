@@ -9,6 +9,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -22,19 +24,19 @@ public class YxObject {
 
     private String BUILDING_ID;
     private String INVERTER_ID;
-    private int VERSION_FAIL=-1;  //软件版本不匹配
-    private int SYSTEM_FAIL=-1;   //系统故障
-    private int NBI_EXP_FAIL=-1;  //逆变电流异常
-    private int CYI_FAIL=-1;      //残余电流异常
-    private int WDGG_FAIL=-1;     //温度过高
-    private int FS_FAIL=-1;       //风扇故障
-    private int SPI_FAIL=-1;      //SPI通讯异常
-    private int JYZKD_FAIL=-1;    //绝缘阻抗低
-    private int AFCI_FAIL=-1;     //AFCI自检失败
-    private int ZLDH_FAIL=-1;     //直流电弧故障
-    private int ZC3_FAIL=-1;      //组串3反向
-    private int LYBHQ_FAIL=-1;    //浪涌保护器故障
-    private int TXZT_FAIL=-1;     //通讯状态
+    private int VERSION_FAIL=-1;        //软件版本不匹配
+    private int SYSTEM_FAIL=-1;         //系统故障
+    private int NBI_EXP_FAIL=-1;        //逆变电流异常
+    private int CYI_FAIL=-1;            //残余电流异常
+    private int WDGG_FAIL=-1;           //温度过高
+    private int FS_FAIL=-1;             //风扇故障
+    private int SPI_FAIL=-1;            //SPI通讯异常
+    private int JYZKD_FAIL=-1;          //绝缘阻抗低
+    private int AFCI_FAIL=-1;           //AFCI自检失败
+    private int ZLDH_FAIL=-1;           //直流电弧故障
+    private int ZC3_FAIL=-1;            //组串3反向
+    private int LYBHQ_FAIL=-1;          //浪涌保护器故障
+//    private int TXZT_FAIL=-1;           //通讯状态
     private boolean flag=false;
     public YxObject(){
     }
@@ -46,7 +48,8 @@ public class YxObject {
 
             public void run() {
                 if(flag==true){
-                    String sql =  "INSERT INTO T_PVMANAGE_INVERTER_FAILURE(FA_ID,FA_NAME,BUILDING_ID,INVERTER_ID,";
+                    String sql =  "INSERT INTO T_PVMANAGE_INVERTER_FAILURE(FA_ID,FA_NAME,BUILDING_ID,INVERTER_ID) " +
+                            "VALUES(?,?,?,?)";
 
                     DBConnection conn = SqlHelper.connPool.getConnection();
                     Parameter[] params = new Parameter[4];
@@ -58,18 +61,48 @@ public class YxObject {
                     YxObject yxTable=new YxObject();
                     Class yx=(Class) yxTable.getClass();
                     Field[] fields=yx.getDeclaredFields();
+                    String failureDescription = null;
 
                     for (int i = 0; i <fields.length ; i++) {
                         Field f = fields[i];
-                        int val;
-                        String name="";
+                        Object val;
+                        String name = null;
                         f.setAccessible(true); //设置些属性是可以访问的
                         try {
-                            val= f.getInt(yxTable);//得到此属性的值
-                            name=f.getName();
-                            if(val==0){
-                                params[1] = new Parameter("FA_NAME", BaseTypes.VARCHAR,name);
+                            val = f.get(yxTable);//得到此属性的值
+                            name = f.getName();
+                            if ("VERSION_FAIL".equals(name)){
+                                failureDescription = "软件版本不匹配";
+                            }else if ("SYSTEM_FAIL".equals(name)){
+                                failureDescription = "系统故障";
+                            }else if ("NBI_EXP_FAIL".equals(name)){
+                                failureDescription = "逆变电流异常";
+                            }else if ("CYI_FAIL".equals(name)){
+                                failureDescription = "残余电流异常";
+                            }else if ("WDGG_FAIL".equals(name)){
+                                failureDescription = "温度过高";
+                            }else if ("FS_FAIL".equals(name)){
+                                failureDescription = "风扇故障";
+                            }else if ("SPI_FAIL".equals(name)){
+                                failureDescription = "SPI通讯异常";
+                            }else if ("JYZKD_FAIL".equals(name)){
+                                failureDescription = "绝缘阻抗低";
+                            }else if ("AFCI_FAIL".equals(name)){
+                                failureDescription = "AFCI自检失败";
+                            }else if ("ZLDH_FAIL".equals(name)){
+                                failureDescription = "直流电弧故障";
+                            }else if ("ZC3_FAIL".equals(name)){
+                                failureDescription = "组串3反向";
+                            }else if ("LYBHQ_FAIL".equals(name)){
+                                failureDescription = "浪涌保护器故障";
+                            }else{
+                                log.debug("非遥信故障信息：" + name);
+                            }
+                            if("0".equals(val)){
+                                params[1] = new Parameter("FA_NAME", BaseTypes.VARCHAR,failureDescription);
                                 SqlHelper.executeNonQuery(conn, CommandType.Text, sql, params);
+                            }else {
+                                log.debug("遥信信息：" + failureDescription + "：false");
                             }
                         }catch (Exception e){
                             e.printStackTrace();
@@ -103,7 +136,6 @@ public class YxObject {
         ZLDH_FAIL=-1;
         ZC3_FAIL=-1;
         LYBHQ_FAIL=-1;
-        TXZT_FAIL=-1;
         this.flag=false;
     }
     public String getBUILDING_ID() {
@@ -228,13 +260,5 @@ public class YxObject {
     public void setLYBHQ_FAIL(int LYBHQ_FAIL) {
         this.LYBHQ_FAIL = LYBHQ_FAIL;
         this.flag = true;
-    }
-
-    public boolean isFlag() {
-        return flag;
-    }
-
-    public void setFlag(boolean flag) {
-        this.flag = flag;
     }
 }
