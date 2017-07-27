@@ -9,8 +9,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -36,8 +34,8 @@ public class YxObject {
     private int ZLDH_FAIL=-1;           //直流电弧故障
     private int ZC3_FAIL=-1;            //组串3反向
     private int LYBHQ_FAIL=-1;          //浪涌保护器故障
-//    private int TXZT_FAIL=-1;           //通讯状态
     private boolean flag=false;
+
     public YxObject(){
     }
     public YxObject(String inverterId, String buildingId){
@@ -52,12 +50,7 @@ public class YxObject {
                             "VALUES(?,?,?,?)";
 
                     DBConnection conn = SqlHelper.connPool.getConnection();
-                    Parameter[] params = new Parameter[4];
 
-                    String id = UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
-                    params[0] = new Parameter("ID", BaseTypes.VARCHAR,id);
-                    params[2] = new Parameter("BUILDING_ID", BaseTypes.VARCHAR,BUILDING_ID);
-                    params[3] = new Parameter("INVERTER_ID", BaseTypes.VARCHAR,INVERTER_ID);
                     YxObject yxTable=new YxObject();
                     Class yx=(Class) yxTable.getClass();
                     Field[] fields=yx.getDeclaredFields();
@@ -96,11 +89,18 @@ public class YxObject {
                             }else if ("LYBHQ_FAIL".equals(name)){
                                 failureDescription = "浪涌保护器故障";
                             }else{
-                                log.debug("非遥信故障信息：" + name);
+                                log.debug("遥信对象里的其他属性：" + name);
                             }
                             if("0".equals(val)){
+                                Parameter[] params = new Parameter[4];
+
+                                String id = UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
+                                params[0] = new Parameter("ID", BaseTypes.VARCHAR,id);
                                 params[1] = new Parameter("FA_NAME", BaseTypes.VARCHAR,failureDescription);
+                                params[2] = new Parameter("BUILDING_ID", BaseTypes.VARCHAR,BUILDING_ID);
+                                params[3] = new Parameter("INVERTER_ID", BaseTypes.VARCHAR,INVERTER_ID);
                                 SqlHelper.executeNonQuery(conn, CommandType.Text, sql, params);
+                                log.debug("插入遥信故障信息到表中," + failureDescription);
                             }else {
                                 log.debug("遥信信息：" + failureDescription + "：false");
                             }

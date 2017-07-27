@@ -352,9 +352,9 @@
   "349":{"name":"ZLDH_FAIL","type":"int","description":"401-1N 直流电弧故障"},
   "350":{"name":"SYSTEM_FAIL","type":"int","description":"401-1N 系统故障"},
   "351":{"name":"","type":"int","description":"401-1N 备用"},
-  "352":{"name":"TXZT_FAIL","type":"int","description":"节点0_101_通讯状态"},
-  "353":{"name":"TXZT_FAIL","type":"int","description":"节点0_301_通讯状态"},
-  "354":{"name":"TXZT_FAIL","type":"int","description":"节点0_302_通讯状态"},
-  "355":{"name":"TXZT_FAIL","type":"int","description":"节点0_306_通讯状态"},
-  "356":{"name":"TXZT_FAIL","type":"int","description":"节点0_401_通讯状态"}
+  "352":{"name":"COMMUNICATE_STATUS","type":"int","description":"节点0_101_通讯状态"},
+  "353":{"name":"COMMUNICATE_STATUS","type":"int","description":"节点0_301_通讯状态"},
+  "354":{"name":"COMMUNICATE_STATUS","type":"int","description":"节点0_302_通讯状态"},
+  "355":{"name":"COMMUNICATE_STATUS","type":"int","description":"节点0_306_通讯状态"},
+  "356":{"name":"COMMUNICATE_STATUS","type":"int","description":"节点0_401_通讯状态"}
 }

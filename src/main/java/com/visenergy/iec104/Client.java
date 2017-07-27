@@ -81,32 +81,74 @@ public class Client {
                             int len = infoObjs[i].getInformationElements().length;
                             for (int j = 0; j < len; j++) {
                                 int address = firstAddress + j;
-                                if(address >357){
+                                if(address >356 || address < 0){
                                     log.warn("遥信信息超出定义范围：" + address);
                                 }
                                 JSONObject yxObjJson =  Init.yxJsonObj.getJSONObject(address+"");
                                 if(yxObjJson != null){
-                                      String yxObjName = null;
-                                      if((address/32 + 1) < 10){
-                                          yxObjName = "NBQ00" + (address/32 + 1);
-                                      }else if((address/32 + 1) < 12){
-                                          yxObjName = "NBQ0" + (address/32 + 1);
-                                        }else{
-                                          //通讯状态
-                                          log.debug(Init.yxJsonObj.getJSONObject(address + "").get("description") + "未存储");
-                                          for (Map.Entry<String, YxObject> entry : DataProcessPool.yxPool.entrySet()) {
-                                              log.debug("遥信对象 ：" + entry.getKey() + " ," + address + "执行方法：set" + yxObjJson.getString("name") + "值：" + ((IeSinglePointWithQuality) infoObjs[i].getInformationElements()[j][0]).isOn());
-                                              int flagInt = ((IeSinglePointWithQuality)infoObjs[i].getInformationElements()[j][0]).isOn() ? 1 : 0;
-                                              setByReflect(entry, yxObjJson.getString("name"), flagInt, yxObjJson.getString("type"));
-                                          }
-                                        }
-                                        if(yxObjName != null){
-                                            log.debug("遥信对象 ：" + yxObjName + " ," + address + "执行方法：set" + yxObjJson.getString("name") + "值：" + ((IeSinglePointWithQuality) infoObjs[i].getInformationElements()[j][0]).isOn());
+                                    String yxObjName = null;
+                                    if ((address / 32 + 1) < 10) {
+                                        yxObjName = "NBQ00" + (address / 32 + 1);
+                                    } else if ((address / 32 + 1) < 12) {
+                                        yxObjName = "NBQ0" + (address / 32 + 1);
+                                    } else {
+                                        //通讯状态
+                                        String yxsObjName = null;
+                                        //遍历数据池中所有遥信状态对象
+                                        for (Map.Entry<String, YxStatusObject> entry : DataProcessPool.yxsPool.entrySet()) {
                                             int flagInt = ((IeSinglePointWithQuality) infoObjs[i].getInformationElements()[j][0]).isOn() ? 1 : 0;
-                                            setValue(1, yxObjName, "set" + yxObjJson.getString("name"), flagInt, yxObjJson.getString("type"));
-                                        }else{
-                                            log.warn("遥信对象无名称！");
+
+                                            //判断地址，确认通讯状态属于哪个逆变器
+                                            if (address == 352){
+                                                if ("NBQ001".equals(entry.getKey()) || "NBQ002".equals(entry.getKey())){//101栋
+                                                    yxsObjName = entry.getKey();
+                                                    setByReflect(entry, yxObjJson.getString("name"), flagInt, yxObjJson.getString("type"));
+                                                }else {
+                                                    log.debug("通讯状态与逆变器" + entry.getKey() + "不匹配");
+                                                }
+                                            }else if (address == 353){//301栋
+                                                if ("NBQ003".equals(entry.getKey()) || "NBQ004".equals(entry.getKey()) || "NBQ005".equals(entry.getKey()) || "NBQ006".equals(entry.getKey()) || "NBQ007".equals(entry.getKey())){
+                                                    yxsObjName = entry.getKey();
+                                                    setByReflect(entry, yxObjJson.getString("name"), flagInt, yxObjJson.getString("type"));
+                                                }else {
+                                                    log.debug("通讯状态与逆变器" + entry.getKey() + "不匹配");
+                                                }
+                                            }else if (address == 354){//302栋
+                                                if ("NBQ008".equals(entry.getKey())){
+                                                    yxsObjName = entry.getKey();
+                                                    setByReflect(entry, yxObjJson.getString("name"), flagInt, yxObjJson.getString("type"));
+                                                }else {
+                                                    log.debug("通讯状态与逆变器" + entry.getKey() + "不匹配");
+                                                }
+                                            }else if (address == 355){//306栋
+                                                if ("NBQ009".equals(entry.getKey()) || "NBQ010".equals(entry.getKey())){
+                                                    yxsObjName = entry.getKey();
+                                                    setByReflect(entry, yxObjJson.getString("name"), flagInt, yxObjJson.getString("type"));
+                                                }else {
+                                                    log.debug("通讯状态与逆变器" + entry.getKey() + "不匹配");
+                                                }
+                                            }else if (address == 356){//401栋
+                                                if ("NBQ011".equals(entry.getKey())){
+                                                    yxsObjName = entry.getKey();
+                                                    setByReflect(entry, yxObjJson.getString("name"), flagInt, yxObjJson.getString("type"));
+                                                }else {
+                                                    log.debug("通讯状态与逆变器" + entry.getKey() + "不匹配");
+                                                }
+                                            }else {
+                                                log.debug("无效的通讯状态地址");
+                                            }
+                                            if (yxsObjName != null){
+                                                log.debug("遥信状态对象 ：" + yxsObjName + " ,信息体地址：" + address + "，执行方法：set" + yxObjJson.getString("name") + "，值：" + ((IeSinglePointWithQuality) infoObjs[i].getInformationElements()[j][0]).isOn());
+                                            }
                                         }
+                                    }
+                                    if (yxObjName != null) {
+                                        log.debug("遥信对象 ：" + yxObjName + " ,信息体地址：" + address + "，执行方法：set" + yxObjJson.getString("name") + "，值：" + ((IeSinglePointWithQuality) infoObjs[i].getInformationElements()[j][0]).isOn());
+                                        int flagInt = ((IeSinglePointWithQuality) infoObjs[i].getInformationElements()[j][0]).isOn() ? 1 : 0;
+                                        setValue(1, yxObjName, "set" + yxObjJson.getString("name"), flagInt, yxObjJson.getString("type"));
+                                    } else {
+                                        log.warn("遥信对象无名称！");
+                                    }
 
                                 }else{
                                     log.warn("找不到的遥信编号: " + address);
@@ -148,13 +190,25 @@ public class Client {
                                         ycObjName = "NBQ011";
                                     }else{
                                         for(Map.Entry<String,YcObject> entry : DataProcessPool.ycPool.entrySet()){
-                                            log.debug("遥测对象 ："+ entry.getKey() +" ,"+ address +"执行方法：set" + ycObjJson.getString("name") +"值：" + ((IeShortFloat)infoObjs[i].getInformationElements()[j][0]).getValue());
+                                            log.debug("遥测对象 ："+ entry.getKey() +" ,信息体地址："+ address +"，执行方法：set" + ycObjJson.getString("name") +"，值：" + ((IeShortFloat)infoObjs[i].getInformationElements()[j][0]).getValue());
                                             setByReflect(entry,ycObjJson.getString("name"),((IeShortFloat)infoObjs[i].getInformationElements()[j][0]).getValue(),ycObjJson.getString("type"));
                                         }
                                     }
                                     if(ycObjName != null){
-                                        log.debug("遥测对象 ："+ ycObjName +" ,"+ address +"执行方法：set" + ycObjJson.getString("name") +"值：" + ((IeShortFloat)infoObjs[i].getInformationElements()[j][0]).getValue());
+                                        log.debug("遥测对象 ："+ ycObjName +" ,信息体地址："+ address +"执行方法：set" + ycObjJson.getString("name") +"，值：" + ((IeShortFloat)infoObjs[i].getInformationElements()[j][0]).getValue());
+                                        //往YcObject对象中的属性set值
                                         setValue(2,ycObjName,"set" + ycObjJson.getString("name"),((IeShortFloat)infoObjs[i].getInformationElements()[j][0]).getValue(),ycObjJson.getString("type"));
+
+                                        //判断是否是遥信状态数据(并网、PV连接、警告状态)，是：将值set进遥信状态对象(YxStatusObject)对应的属性中
+                                        if ("CONNECT_STATUS".equals(ycObjJson.getString("name"))){
+                                            setValue(3,ycObjName,"set" + ycObjJson.getString("name"),((IeShortFloat)infoObjs[i].getInformationElements()[j][0]).getValue(),ycObjJson.getString("type"));
+                                        }else if("PV_CONNECT_STATUS".equals(ycObjJson.getString("name"))){
+                                            setValue(3,ycObjName,"set" + ycObjJson.getString("name"),((IeShortFloat)infoObjs[i].getInformationElements()[j][0]).getValue(),ycObjJson.getString("type"));
+                                        }else if("WARNING_STATUS".equals(ycObjJson.getString("name"))){
+                                            setValue(3,ycObjName,"set" + ycObjJson.getString("name"),((IeShortFloat)infoObjs[i].getInformationElements()[j][0]).getValue(),ycObjJson.getString("type"));
+                                        }else {
+                                            log.debug("非遥信状态数据");
+                                        }
                                     }else{
                                         log.warn("遥测对象无名称！");
                                     }
@@ -189,8 +243,10 @@ public class Client {
         Object obj = null;
         if (typeObj == 1){
             obj = DataProcessPool.yxPool.get(ycSerial);
-        }else{
+        }else if(typeObj == 2){
             obj = DataProcessPool.ycPool.get(ycSerial);
+        }else{
+            obj = DataProcessPool.yxsPool.get(ycSerial);
         }
         //执行反射方法
         setByReflect(obj,methodName,methodValue,mt);

@@ -3,7 +3,6 @@ package com.visenergy.iec104;
 import com.flying.jdbc.SqlHelper;
 import com.flying.jdbc.data.CommandType;
 import com.flying.jdbc.util.DBConnection;
-import com.flying.jdbc.util.DBConnectionPool;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -19,6 +18,8 @@ public class DataProcessPool {
 
     public static Map<String,YcObject> ycPool = new HashMap<String,YcObject>();
     public static Map<String,YxObject> yxPool = new HashMap<String,YxObject>();
+    public static Map<String,YxStatusObject> yxsPool = new HashMap<String,YxStatusObject>();
+
 
     public static void initPool(){
         DBConnection conn = SqlHelper.connPool.getConnection();
@@ -29,6 +30,7 @@ public class DataProcessPool {
             for (int i = 0; i< list.size();i++){
                 ycPool.put((String) list.get(i).get("SERIAL"),new YcObject((String) list.get(i).get("INVERTER_ID")));
                 yxPool.put((String) list.get(i).get("SERIAL"),new YxObject((String) list.get(i).get("INVERTER_ID"),(String) list.get(i).get("BUILDING_ID")));
+                yxsPool.put((String) list.get(i).get("SERIAL"),new YxStatusObject((String) list.get(i).get("INVERTER_ID")));
             }
 
         } catch (Exception e) {

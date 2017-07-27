@@ -9,6 +9,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -79,6 +80,7 @@ public class YcObject {
 
             public void run() {
                 if(flag==true){
+                    //逆变器数据采集表(历史表)插入语句
                     String sql = "INSERT INTO T_PVMANAGE_INVERTER_COLLECT(ID,INVERTER_ID,ELEC_PROD_HOUR,ELEC_PROD_DAILY," +
                             "ELEC_PROD_MONTH,ELEC_PROD_YEAR,ELEC_PROD_ALL,OUTPUT_P,CONNECT_P,PEAK_POWER,REACTIVE_P," +
                             "PV1_U,PV1_I,PV2_U,PV2_I,PV3_U,PV3_I,PV4_U,PV4_I,PV5_U,PV5_I,PV6_U,PV6_I,PV7_U,PV7_I,PV8_U,PV8_I," +
@@ -86,18 +88,18 @@ public class YcObject {
                             "COAL_SAVE,CONVERT_BENF,CONNECT_STATUS,PV_CONNECT_STATUS,WARNING_STATUS,AMBIENT_TEMP," +
                             "RADIANT_QUANTITY_1,IRRADIANCE_1,RADIANT_QUANTITY_2,IRRADIANCE_2,DAMPNESS,PRESSURE,WIND_SPEED,WIND_DIR) " +
                             "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-
+                    //逆变器实时数据表更新语句
                     String inverter_data_now = "UPDATE T_PVMANAGE_INVERTER_COLLECT_C SET ELEC_PROD_HOUR=?,ELEC_PROD_DAILY=?," +
                             "ELEC_PROD_MONTH=?,ELEC_PROD_YEAR=?,ELEC_PROD_ALL=?,OUTPUT_P=?,CONNECT_P=?,PEAK_POWER=?," +
                             "REACTIVE_P=?,PV1_U=?,PV1_I=?,PV2_U=?,PV2_I=?,PV3_U=?,PV3_I=?,PV4_U=?,PV4_I=?,PV5_U=?,PV5_I=?," +
                             "PV6_U=?,PV6_I=?,PV7_U=?,PV7_I=?,PV8_U=?,PV8_I=?,AC_UA=?,AC_UB=?,AC_UC=?,AC_IA=?,AC_IB=?,AC_IC=?," +
                             "MACHINE_TEMP=?,GRID_FRQ=?,CONVERT_EFF=?,CO2_CUTS=?,COAL_SAVE=?,CONVERT_BENF=?,AMBIENT_TEMP=?," +
-                            "RADIANT_QUANTITY_1=?,IRRADIANCE_1=?,RADIANT_QUANTITY_2=?,IRRADIANCE_2=?,DAMPNESS=?,PRESSURE=?,WIND_SPEED=?,WIND_DIR=? " +
+                            "RADIANT_QUANTITY_1=?,IRRADIANCE_1=?,RADIANT_QUANTITY_2=?,IRRADIANCE_2=?,DAMPNESS=?,PRESSURE=?,WIND_SPEED=?,WIND_DIR=?,TIME=? " +
                             "WHERE INVERTER_ID = ?";
 
                     DBConnection conn = SqlHelper.connPool.getConnection();
                     Parameter[] params = new Parameter[51];
-                    Parameter[] params_new_data = new Parameter[47];
+                    Parameter[] params_new_data = new Parameter[48];
 
                     //逆变器数据采集历史表
                     String id = UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
@@ -200,7 +202,8 @@ public class YcObject {
                     params_new_data[43] = params[48];
                     params_new_data[44] = params[49];
                     params_new_data[45] = params[50];
-                    params_new_data[46] = params[1];
+                    params_new_data[46] = new Parameter("TIME", BaseTypes.TIMESTAMP,new Timestamp(System.currentTimeMillis()));
+                    params_new_data[47] = params[1];
 
                     try {
                         SqlHelper.executeNonQuery(conn, CommandType.Text, sql, params);
@@ -212,7 +215,6 @@ public class YcObject {
                         e.printStackTrace();
                     }
                     SqlHelper.connPool.releaseConnection(conn);
-
                 }else{
                     log.debug("未接收到数据");
                 }
