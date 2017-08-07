@@ -96,10 +96,13 @@ public class YcObject {
                             "MACHINE_TEMP=?,GRID_FRQ=?,CONVERT_EFF=?,CO2_CUTS=?,COAL_SAVE=?,CONVERT_BENF=?,AMBIENT_TEMP=?," +
                             "RADIANT_QUANTITY_1=?,IRRADIANCE_1=?,RADIANT_QUANTITY_2=?,IRRADIANCE_2=?,DAMPNESS=?,PRESSURE=?,WIND_SPEED=?,WIND_DIR=?,TIME=? " +
                             "WHERE INVERTER_ID = ?";
+                    //环境数据采集
+                    String metero_sql = "INSERT INTO T_PVMANAGE_METERO(METERO_ID,SUN_STRENGTH,WIND_SPEED,WIND_DIREC,PANEL_TEMP,AMBIEN_TEMP) VALUES(?,?,?,?,?,?)";
 
                     DBConnection conn = SqlHelper.connPool.getConnection();
                     Parameter[] params = new Parameter[51];
                     Parameter[] params_new_data = new Parameter[48];
+                    Parameter[] params_metero_data = new Parameter[7];
 
                     //逆变器数据采集历史表
                     String id = UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
@@ -205,10 +208,21 @@ public class YcObject {
                     params_new_data[46] = new Parameter("TIME", BaseTypes.TIMESTAMP,new Timestamp(System.currentTimeMillis()));
                     params_new_data[47] = params[1];
 
+                    //气象数据
+                    String meteroId = UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
+                    params_metero_data[0] = new Parameter("METERO_ID", BaseTypes.VARCHAR,meteroId);
+                    params_metero_data[1] = params[44];
+                    params_metero_data[2] = params[49];
+                    params_metero_data[3] = params[50];
+                    params_metero_data[4] = params[33];
+                    params_metero_data[5] = params[42];
+
                     try {
                         SqlHelper.executeNonQuery(conn, CommandType.Text, sql, params);
                         //将最新数据更新到逆变器实时数据表
                         SqlHelper.executeNonQuery(conn, CommandType.Text, inverter_data_now, params_new_data);
+                        //插入环境仪采集数据
+                        SqlHelper.executeNonQuery(conn, CommandType.Text, metero_sql, params_metero_data);
                         clear();
 
                     } catch (Exception e) {
@@ -224,7 +238,7 @@ public class YcObject {
         };
         ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
         // 第二个参数为首次执行的延时时间，第三个参数为定时执行的间隔时间
-        service.scheduleAtFixedRate(runnable, 0, 300, TimeUnit.SECONDS);
+        service.scheduleAtFixedRate(runnable, 480, 480, TimeUnit.SECONDS);
     }
 
     public void clear(){
