@@ -107,6 +107,8 @@ public class YcObject {
                     //逆变器数据采集历史表
                     String id = UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
                     COAL_SAVE = CO2_CUTS/2.493;
+                    CONVERT_BENF = (0.42+0.3)*ELEC_PROD_YEAR;
+
                     params[0] = new Parameter("ID", BaseTypes.VARCHAR,id);
                     params[1] = new Parameter("INVERTER_ID", BaseTypes.VARCHAR,INVERTER_ID);
                     params[2] = new Parameter("ELEC_PROD_HOUR", BaseTypes.DECIMAL,new BigDecimal(ELEC_PROD_HOUR).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());

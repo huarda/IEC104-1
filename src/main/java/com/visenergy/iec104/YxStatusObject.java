@@ -35,7 +35,7 @@ public class YxStatusObject {
             public void run() {
                 if(flag==true){
                     String sql = "UPDATE T_PVMANAGE_INVERTER A SET A.COMMUNICATE_STATUS = ?,A.CONNECT_STATUS = ?," +
-                            "A.PV_CONNECT_STATUS = ?,A.WARNING_STATUS = ?,A.INSTALL_TIME=? WHERE A.INVERTER_ID = ?";
+                            "A.PV_CONNECT_STATUS = ?,A.WARNING_STATUS = ?,A.TIME=? WHERE A.INVERTER_ID = ?";
 
                     DBConnection conn = SqlHelper.connPool.getConnection();
                     Parameter[] params = new Parameter[6];
@@ -45,7 +45,7 @@ public class YxStatusObject {
                     params[1] = new Parameter("CONNECT_STATUS", BaseTypes.INTEGER,CONNECT_STATUS);
                     params[2] = new Parameter("PV_CONNECT_STATUS", BaseTypes.INTEGER,PV_CONNECT_STATUS);
                     params[3] = new Parameter("WARNING_STATUS", BaseTypes.INTEGER,WARNING_STATUS);
-                    params[4] = new Parameter("INSTALL_TIME", BaseTypes.TIMESTAMP,new Timestamp(System.currentTimeMillis()));
+                    params[4] = new Parameter("TIME", BaseTypes.TIMESTAMP,new Timestamp(System.currentTimeMillis()));
                     params[5] = new Parameter("INVERTER_ID", BaseTypes.VARCHAR,INVERTER_ID);
 
                     try {
