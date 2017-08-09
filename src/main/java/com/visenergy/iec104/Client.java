@@ -94,54 +94,57 @@ public class Client {
                                     } else {
                                         //通讯状态
                                         String yxsObjName = null;
+                                        //通讯状态值
+                                        int flagInt = ((IeSinglePointWithQuality) infoObjs[i].getInformationElements()[j][0]).isOn() ? 1 : 0;
                                         //遍历数据池中所有遥信状态对象
                                         for (Map.Entry<String, YxStatusObject> entry : DataProcessPool.yxsPool.entrySet()) {
-                                            int flagInt = ((IeSinglePointWithQuality) infoObjs[i].getInformationElements()[j][0]).isOn() ? 1 : 0;
 
-                                            //判断地址，确认通讯状态属于哪个逆变器
+                                            //判断地址，确认通讯状态属于哪些逆变器
                                             if (address == 352){
                                                 if ("NBQ001".equals(entry.getKey()) || "NBQ002".equals(entry.getKey())){//101栋
                                                     yxsObjName = entry.getKey();
-                                                    setByReflect(entry, yxObjJson.getString("name"), flagInt, yxObjJson.getString("type"));
                                                 }else {
                                                     log.debug("通讯状态与逆变器" + entry.getKey() + "不匹配");
                                                 }
                                             }else if (address == 353){//301栋
                                                 if ("NBQ003".equals(entry.getKey()) || "NBQ004".equals(entry.getKey()) || "NBQ005".equals(entry.getKey()) || "NBQ006".equals(entry.getKey()) || "NBQ007".equals(entry.getKey())){
                                                     yxsObjName = entry.getKey();
-                                                    setByReflect(entry, yxObjJson.getString("name"), flagInt, yxObjJson.getString("type"));
                                                 }else {
                                                     log.debug("通讯状态与逆变器" + entry.getKey() + "不匹配");
                                                 }
                                             }else if (address == 354){//302栋
                                                 if ("NBQ008".equals(entry.getKey())){
                                                     yxsObjName = entry.getKey();
-                                                    setByReflect(entry, yxObjJson.getString("name"), flagInt, yxObjJson.getString("type"));
                                                 }else {
                                                     log.debug("通讯状态与逆变器" + entry.getKey() + "不匹配");
                                                 }
                                             }else if (address == 355){//306栋
                                                 if ("NBQ009".equals(entry.getKey()) || "NBQ010".equals(entry.getKey())){
                                                     yxsObjName = entry.getKey();
-                                                    setByReflect(entry, yxObjJson.getString("name"), flagInt, yxObjJson.getString("type"));
                                                 }else {
                                                     log.debug("通讯状态与逆变器" + entry.getKey() + "不匹配");
                                                 }
                                             }else if (address == 356){//401栋
                                                 if ("NBQ011".equals(entry.getKey())){
                                                     yxsObjName = entry.getKey();
-                                                    setByReflect(entry, yxObjJson.getString("name"), flagInt, yxObjJson.getString("type"));
                                                 }else {
                                                     log.debug("通讯状态与逆变器" + entry.getKey() + "不匹配");
                                                 }
                                             }else {
                                                 log.debug("无效的通讯状态地址");
                                             }
+
+                                            //遥信状态对象
                                             if (yxsObjName != null){
                                                 log.debug("遥信状态对象 ：" + yxsObjName + " ,信息体地址：" + address + "，执行方法：set" + yxObjJson.getString("name") + "，值：" + ((IeSinglePointWithQuality) infoObjs[i].getInformationElements()[j][0]).isOn());
+                                                setValue(3, yxsObjName, "set" + yxObjJson.getString("name"), flagInt, yxObjJson.getString("type"));
+                                            }else {
+                                                log.warn("遥信状态对象无名称! ");
                                             }
                                         }
                                     }
+
+                                    //遥信对象
                                     if (yxObjName != null) {
                                         log.debug("遥信对象 ：" + yxObjName + " ,信息体地址：" + address + "，执行方法：set" + yxObjJson.getString("name") + "，值：" + ((IeSinglePointWithQuality) infoObjs[i].getInformationElements()[j][0]).isOn());
                                         int flagInt = ((IeSinglePointWithQuality) infoObjs[i].getInformationElements()[j][0]).isOn() ? 1 : 0;
