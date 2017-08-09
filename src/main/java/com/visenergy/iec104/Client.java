@@ -157,7 +157,7 @@ public class Client {
                                     log.warn("找不到的遥信编号: " + address);
                                 }
                             }
-                        }else if(typeId == 13){//浮点型遥信处理
+                        }else if(typeId == 13){//浮点型遥测处理
                             int firstAddress = infoObjs[i].getInformationObjectAddress();
                             int len = infoObjs[i].getInformationElements().length;
                             for (int j = 0; j < len; j++) {
@@ -192,9 +192,10 @@ public class Client {
                                     }else if(address>= 16858 && address < 16910){
                                         ycObjName = "NBQ011";
                                     }else{
+                                        //遥测，气象数据
                                         for(Map.Entry<String,YcObject> entry : DataProcessPool.ycPool.entrySet()){
                                             log.debug("遥测对象 ："+ entry.getKey() +" ,信息体地址："+ address +"，执行方法：set" + ycObjJson.getString("name") +"，值：" + ((IeShortFloat)infoObjs[i].getInformationElements()[j][0]).getValue());
-                                            setByReflect(entry,ycObjJson.getString("name"),((IeShortFloat)infoObjs[i].getInformationElements()[j][0]).getValue(),ycObjJson.getString("type"));
+                                            setValue(2,entry.getKey(),"set" + ycObjJson.getString("name"),((IeShortFloat)infoObjs[i].getInformationElements()[j][0]).getValue(),ycObjJson.getString("type"));
                                         }
                                     }
                                     if(ycObjName != null){
