@@ -102,7 +102,7 @@ public class YcObject {
                     DBConnection conn = SqlHelper.connPool.getConnection();
                     Parameter[] params = new Parameter[51];
                     Parameter[] params_new_data = new Parameter[48];
-                    Parameter[] params_metero_data = new Parameter[7];
+                    Parameter[] params_metero_data = new Parameter[6];
 
                     //逆变器数据采集历史表
                     String id = UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
