@@ -267,15 +267,20 @@ public class Client {
      */
     public static void setByReflect(Object obj,String methodName,Object methodValue,String mt) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Method objMethod = null;
-        if("DECIMAL".equals(mt)){
-            objMethod = obj.getClass().getMethod(methodName,double.class);
-        }else if("int".equals(mt)){
-            objMethod = obj.getClass().getMethod(methodName,int.class);
-        }else if("String".equals(mt)){
-            objMethod = obj.getClass().getMethod(methodName,String.class);
-        }else{
-            log.warn("不存在的方法类型，无法生成反射方法。");
+        if (!"set".equals(methodName)){
+            if("DECIMAL".equals(mt)){
+                objMethod = obj.getClass().getMethod(methodName,double.class);
+            }else if("int".equals(mt)){
+                objMethod = obj.getClass().getMethod(methodName,int.class);
+            }else if("String".equals(mt)){
+                objMethod = obj.getClass().getMethod(methodName,String.class);
+            }else{
+                log.warn("不存在的方法类型，无法生成反射方法。");
+            }
+        }else {
+            log.warn("YcObject对象中不存在该set方法");
         }
+
         if(objMethod != null){
             objMethod.invoke(obj,methodValue);
         }else{

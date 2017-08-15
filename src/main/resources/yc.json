@@ -211,7 +211,7 @@
   "16590":{"name":"CONNECT_STATUS","type":"int","description":"301(33KW)-2N 并网状态"},
   "16591":{"name":"","type":"DECIMAL","description":"301(33KW)-2N 绝缘阻抗值"},
   "16592":{"name":"","type":"DECIMAL","description":"301(33KW)-2N 开机时间"},
-  "16593":{"name":"","type":"DECIMAL","description":"301(33KW)-1N 关机时间"},
+  "16593":{"name":"","type":"DECIMAL","description":"301(33KW)-2N 关机时间"},
 
   "16594":{"name":"PV1_U","type":"DECIMAL","description":"301(17KW)-1N PV1输入电压"},
   "16595":{"name":"PV2_U","type":"DECIMAL","description":"301(17KW)-1N PV2输入电压"},

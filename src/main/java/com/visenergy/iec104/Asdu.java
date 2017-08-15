@@ -68,7 +68,7 @@ public class Asdu {
             log.debug("信息体地址连续：" +isSequenceOfElements+"，信息数据条数：" + addressNum);
         } else {
             isSequenceOfElements = false;
-            log.debug("信息体地址不连续：" +isSequenceOfElements+"，信息数据条数：" + addressNum);
+            log.debug("信息体地址连续：" +isSequenceOfElements+"，信息数据条数：" + addressNum);
         }
         int numberOfSequenceElements;
         int numberOfInformationObjects;
