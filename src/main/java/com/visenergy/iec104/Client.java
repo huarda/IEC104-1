@@ -87,11 +87,29 @@ public class Client {
                                 JSONObject yxObjJson =  Init.yxJsonObj.getJSONObject(address+"");
                                 if(yxObjJson != null){
                                     String yxObjName = null;
-                                    if ((address / 32 + 1) < 10) {
-                                        yxObjName = "NBQ00" + (address / 32 + 1);
-                                    } else if ((address / 32 + 1) < 12) {
-                                        yxObjName = "NBQ0" + (address / 32 + 1);
-                                    } else {
+                                    if(address>= 0 && address < 32){
+                                        yxObjName = "NO101";
+                                    }else if(address>= 32 && address < 64 ){
+                                        yxObjName = "NO102";
+                                    }else if(address>= 64 && address < 96){
+                                        yxObjName = "NO204";
+                                    }else if(address>= 96 && address < 128){
+                                        yxObjName = "NO205";
+                                    }else if(address>= 128 && address < 160){
+                                        yxObjName = "NO201";
+                                    }else if(address>= 160 && address < 192){
+                                        yxObjName = "NO202";
+                                    }else if(address>= 192 && address < 224){
+                                        yxObjName = "NO203";
+                                    }else if(address>= 224 && address < 256){
+                                        yxObjName = "NO302";
+                                    }else if(address>= 256 && address < 288){
+                                        yxObjName = "NO401";
+                                    }else if(address>= 288 && address < 320){
+                                        yxObjName = "NO402";
+                                    }else if(address>= 320 && address < 352){
+                                        yxObjName = "NO501";
+                                    }else {
                                         //通讯状态
                                         String yxsObjName = null;
                                         //通讯状态值
@@ -101,31 +119,31 @@ public class Client {
 
                                             //判断地址，确认通讯状态属于哪些逆变器
                                             if (address == 352){
-                                                if ("NBQ001".equals(entry.getKey()) || "NBQ002".equals(entry.getKey())){//101栋
+                                                if ("NO101".equals(entry.getKey()) || "NO102".equals(entry.getKey())){//101栋
                                                     yxsObjName = entry.getKey();
                                                 }else {
                                                     log.debug("通讯状态与逆变器" + entry.getKey() + "不匹配");
                                                 }
                                             }else if (address == 353){//301栋
-                                                if ("NBQ003".equals(entry.getKey()) || "NBQ004".equals(entry.getKey()) || "NBQ005".equals(entry.getKey()) || "NBQ006".equals(entry.getKey()) || "NBQ007".equals(entry.getKey())){
+                                                if ("NO201".equals(entry.getKey()) || "NO202".equals(entry.getKey()) || "NO203".equals(entry.getKey()) || "NO204".equals(entry.getKey()) || "NO205".equals(entry.getKey())){
                                                     yxsObjName = entry.getKey();
                                                 }else {
                                                     log.debug("通讯状态与逆变器" + entry.getKey() + "不匹配");
                                                 }
                                             }else if (address == 354){//302栋
-                                                if ("NBQ008".equals(entry.getKey())){
+                                                if ("NO302".equals(entry.getKey())){
                                                     yxsObjName = entry.getKey();
                                                 }else {
                                                     log.debug("通讯状态与逆变器" + entry.getKey() + "不匹配");
                                                 }
                                             }else if (address == 355){//306栋
-                                                if ("NBQ009".equals(entry.getKey()) || "NBQ010".equals(entry.getKey())){
+                                                if ("NO401".equals(entry.getKey()) || "NO402".equals(entry.getKey())){
                                                     yxsObjName = entry.getKey();
                                                 }else {
                                                     log.debug("通讯状态与逆变器" + entry.getKey() + "不匹配");
                                                 }
                                             }else if (address == 356){//401栋
-                                                if ("NBQ011".equals(entry.getKey())){
+                                                if ("NO501".equals(entry.getKey())){
                                                     yxsObjName = entry.getKey();
                                                 }else {
                                                     log.debug("通讯状态与逆变器" + entry.getKey() + "不匹配");
@@ -170,27 +188,27 @@ public class Client {
                                 if(ycObjJson != null){
                                     String ycObjName = null;
                                     if(address>= 16385 && address < 16437){
-                                        ycObjName = "NBQ001";
+                                        ycObjName = "NO101";
                                     }else if(address>= 16437 && address < 16489 ){
-                                        ycObjName = "NBQ002";
+                                        ycObjName = "NO102";
                                     }else if(address>= 16498 && address < 16546){
-                                        ycObjName = "NBQ003";
+                                        ycObjName = "NO204";
                                     }else if(address>= 16546 && address < 16594){
-                                        ycObjName = "NBQ004";
+                                        ycObjName = "NO205";
                                     }else if(address>= 16594 && address < 16636){
-                                        ycObjName = "NBQ005";
+                                        ycObjName = "NO201";
                                     }else if(address>= 16636 && address < 16678){
-                                        ycObjName = "NBQ006";
+                                        ycObjName = "NO202";
                                     }else if(address>= 16678 && address < 16720){
-                                        ycObjName = "NBQ007";
+                                        ycObjName = "NO203";
                                     }else if(address>= 16720 && address < 16762){
-                                        ycObjName = "NBQ008";
+                                        ycObjName = "NO302";
                                     }else if(address>= 16762 && address < 16810){
-                                        ycObjName = "NBQ009";
+                                        ycObjName = "NO401";
                                     }else if(address>= 16810 && address < 16858){
-                                        ycObjName = "NBQ010";
+                                        ycObjName = "NO402";
                                     }else if(address>= 16858 && address < 16910){
-                                        ycObjName = "NBQ011";
+                                        ycObjName = "NO501";
                                     }else{
                                         //遥测，气象数据
                                         for(Map.Entry<String,YcObject> entry : DataProcessPool.ycPool.entrySet()){

@@ -9,7 +9,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.sql.Timestamp;
-import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -40,8 +39,7 @@ public class YxStatusObject {
                     DBConnection conn = SqlHelper.connPool.getConnection();
                     Parameter[] params = new Parameter[6];
 
-                    String id = UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
-                    params[0] = new Parameter("COMMUNICATE_STATUS", BaseTypes.INTEGER,id);
+                    params[0] = new Parameter("COMMUNICATE_STATUS", BaseTypes.INTEGER,COMMUNICATE_STATUS);
                     params[1] = new Parameter("CONNECT_STATUS", BaseTypes.INTEGER,CONNECT_STATUS);
                     params[2] = new Parameter("PV_CONNECT_STATUS", BaseTypes.INTEGER,PV_CONNECT_STATUS);
                     params[3] = new Parameter("WARNING_STATUS", BaseTypes.INTEGER,WARNING_STATUS);
@@ -105,10 +103,10 @@ public class YxStatusObject {
     }
 
     public void clear(){
-        COMMUNICATE_STATUS = -1;
-        CONNECT_STATUS = -1;
-        PV_CONNECT_STATUS = -1;
-        WARNING_STATUS = -1;
+//        COMMUNICATE_STATUS = -1;
+//        CONNECT_STATUS = -1;
+//        PV_CONNECT_STATUS = -1;
+//        WARNING_STATUS = -1;
         this.flag=false;
     }
 }

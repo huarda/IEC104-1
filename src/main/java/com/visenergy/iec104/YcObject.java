@@ -1,16 +1,24 @@
 package com.visenergy.iec104;
 
+import com.corundumstudio.socketio.AckRequest;
+import com.corundumstudio.socketio.Configuration;
+import com.corundumstudio.socketio.SocketIOClient;
+import com.corundumstudio.socketio.SocketIOServer;
+import com.corundumstudio.socketio.listener.ConnectListener;
+import com.corundumstudio.socketio.listener.DataListener;
+import com.corundumstudio.socketio.listener.DisconnectListener;
 import com.flying.jdbc.SqlHelper;
 import com.flying.jdbc.data.CommandType;
 import com.flying.jdbc.data.Parameter;
 import com.flying.jdbc.db.type.BaseTypes;
 import com.flying.jdbc.util.DBConnection;
+import net.sf.json.JSONObject;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -20,58 +28,63 @@ import java.util.concurrent.TimeUnit;
  */
 public class YcObject {
     private Log log = LogFactory.getLog(YcObject.class);
+    private static List<SocketIOClient> clients = new ArrayList<SocketIOClient>();
 
     private String ID;
     private String INVERTER_ID;
-    private double ELEC_PROD_HOUR=-1;
-    private double ELEC_PROD_DAILY=-1;
-    private double ELEC_PROD_MONTH=-1;
-    private double ELEC_PROD_YEAR=-1;
-    private double ELEC_PROD_ALL=-1;
-    private double OUTPUT_P=-1;
-    private double CONNECT_P=-1;
-    private double PEAK_POWER=-1;
-    private double REACTIVE_P=-1;
-    private double PV1_U=-1;
-    private double PV1_I=-1;
-    private double PV2_U=-1;
-    private double PV2_I=-1;
-    private double PV3_U=-1;
-    private double PV3_I=-1;
-    private double PV4_U=-1;
-    private double PV4_I=-1;
-    private double PV5_U=-1;
-    private double PV5_I=-1;
-    private double PV6_U=-1;
-    private double PV6_I=-1;
-    private double PV7_U=-1;
-    private double PV7_I=-1;
-    private double PV8_U=-1;
-    private double PV8_I=-1;
-    private double AC_UA=-1;
-    private double AC_UB=-1;
-    private double AC_UC=-1;
-    private double AC_IA=-1;
-    private double AC_IB=-1;
-    private double AC_IC=-1;
-    private double MACHINE_TEMP=-1;
-    private double GRID_FRQ=-1;
-    private double CONVERT_EFF=-1;
-    private double CO2_CUTS=-1;
-    private double COAL_SAVE=-1;
-    private double CONVERT_BENF=-1;
-    private int CONNECT_STATUS=-1;
-    private int PV_CONNECT_STATUS=-1;
-    private int WARNING_STATUS=-1;
-    private double AMBIENT_TEMP=-200;           //环境温度
-    private double RADIANT_QUANTITY_1=-1;       //辐射量1
-    private double IRRADIANCE_1=-1;             //辐照度1
-    private double RADIANT_QUANTITY_2=-1;       //辐射量2
-    private double IRRADIANCE_2=-1;             //辐照度2
-    private double DAMPNESS=-1;                 //湿度
-    private double PRESSURE=-1;                 //压力
-    private double WIND_SPEED=-1;               //风速
-    private double WIND_DIR=-1;                 //风向
+    private double ELEC_PROD_HOUR=0;
+    private double ELEC_PROD_DAILY=0;
+    private double ELEC_PROD_MONTH=0;
+    private double ELEC_PROD_YEAR=0;
+    private double ELEC_PROD_ALL=0;
+    private double OUTPUT_P=0;
+    private double CONNECT_P=0;
+    private double PEAK_POWER=0;
+    private double REACTIVE_P=0;
+    private double PV1_U=0;
+    private double PV1_I=0;
+    private double PV2_U=0;
+    private double PV2_I=0;
+    private double PV3_U=0;
+    private double PV3_I=0;
+    private double PV4_U=0;
+    private double PV4_I=0;
+    private double PV5_U=0;
+    private double PV5_I=0;
+    private double PV6_U=0;
+    private double PV6_I=0;
+    private double PV7_U=0;
+    private double PV7_I=0;
+    private double PV8_U=0;
+    private double PV8_I=0;
+    private double AC_UA=0;
+    private double AC_UB=0;
+    private double AC_UC=0;
+    private double AC_IA=0;
+    private double AC_IB=0;
+    private double AC_IC=0;
+    private double MACHINE_TEMP=0;
+    private double GRID_FRQ=0;
+    private double CONVERT_EFF=0;
+    private double CO2_CUTS=0;
+    private double COAL_SAVE=0;
+    private double CONVERT_BENF=0;
+    private int CONNECT_STATUS=0;
+    private int PV_CONNECT_STATUS=0;
+    private int WARNING_STATUS=0;
+    private double AMBIENT_TEMP=0;             //环境温度
+    private double RADIANT_QUANTITY_1=0;       //辐射量1
+    private double IRRADIANCE_1=0;             //辐照度1
+    private double RADIANT_QUANTITY_2=0;       //辐射量2
+    private double IRRADIANCE_2=0;             //辐照度2
+    private double DAMPNESS=0;                 //湿度
+    private double PRESSURE=0;                 //压力
+    private double WIND_SPEED=0;               //风速
+    private double WIND_DIR=0;                 //风向
+    private double FULL_HOURS_DAY=0;           //日满发小时数
+    private double FULL_HOURS_MON=0;           //月满发小时数
+    private double FULL_HOURS_YEAR=0;          //年满发小时数
+    private double FULL_HOURS_ALL=0;           //累计满发小时数
     private boolean flag=false;
 
     public YcObject(String inverterId){
@@ -86,28 +99,73 @@ public class YcObject {
                             "PV1_U,PV1_I,PV2_U,PV2_I,PV3_U,PV3_I,PV4_U,PV4_I,PV5_U,PV5_I,PV6_U,PV6_I,PV7_U,PV7_I,PV8_U,PV8_I," +
                             "AC_UA,AC_UB,AC_UC,AC_IA,AC_IB,AC_IC,MACHINE_TEMP,GRID_FRQ,CONVERT_EFF,CO2_CUTS," +
                             "COAL_SAVE,CONVERT_BENF,CONNECT_STATUS,PV_CONNECT_STATUS,WARNING_STATUS,AMBIENT_TEMP," +
-                            "RADIANT_QUANTITY_1,IRRADIANCE_1,RADIANT_QUANTITY_2,IRRADIANCE_2,DAMPNESS,PRESSURE,WIND_SPEED,WIND_DIR) " +
-                            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                            "RADIANT_QUANTITY_1,IRRADIANCE_1,RADIANT_QUANTITY_2,IRRADIANCE_2,DAMPNESS,PRESSURE,WIND_SPEED,WIND_DIR," +
+                            "FULL_HOURS_DAY,FULL_HOURS_MON,FULL_HOURS_YEAR,FULL_HOURS_ALL) " +
+                            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
                     //逆变器实时数据表更新语句
                     String inverter_data_now = "UPDATE T_PVMANAGE_INVERTER_COLLECT_C SET ELEC_PROD_HOUR=?,ELEC_PROD_DAILY=?," +
                             "ELEC_PROD_MONTH=?,ELEC_PROD_YEAR=?,ELEC_PROD_ALL=?,OUTPUT_P=?,CONNECT_P=?,PEAK_POWER=?," +
                             "REACTIVE_P=?,PV1_U=?,PV1_I=?,PV2_U=?,PV2_I=?,PV3_U=?,PV3_I=?,PV4_U=?,PV4_I=?,PV5_U=?,PV5_I=?," +
                             "PV6_U=?,PV6_I=?,PV7_U=?,PV7_I=?,PV8_U=?,PV8_I=?,AC_UA=?,AC_UB=?,AC_UC=?,AC_IA=?,AC_IB=?,AC_IC=?," +
                             "MACHINE_TEMP=?,GRID_FRQ=?,CONVERT_EFF=?,CO2_CUTS=?,COAL_SAVE=?,CONVERT_BENF=?,AMBIENT_TEMP=?," +
-                            "RADIANT_QUANTITY_1=?,IRRADIANCE_1=?,RADIANT_QUANTITY_2=?,IRRADIANCE_2=?,DAMPNESS=?,PRESSURE=?,WIND_SPEED=?,WIND_DIR=?,TIME=? " +
+                            "RADIANT_QUANTITY_1=?,IRRADIANCE_1=?,RADIANT_QUANTITY_2=?,IRRADIANCE_2=?,DAMPNESS=?,PRESSURE=?,WIND_SPEED=?,WIND_DIR=?," +
+                            "FULL_HOURS_DAY=?,FULL_HOURS_MON=?,FULL_HOURS_YEAR=?,FULL_HOURS_ALL=?,TIME=? " +
                             "WHERE INVERTER_ID = ?";
                     //环境数据采集
-                    String metero_sql = "INSERT INTO T_PVMANAGE_METERO(METERO_ID,SUN_STRENGTH,WIND_SPEED,WIND_DIREC,PANEL_TEMP,AMBIEN_TEMP) VALUES(?,?,?,?,?,?)";
+                    String metero_sql = "INSERT INTO T_PVMANAGE_METERO(METERO_ID,WIND_SPEED,WIND_DIREC,PANEL_TEMP,AMBIEN_TEMP,RADIANT_QUANTITY_1,IRRADIANCE_1," +
+                            "RADIANT_QUANTITY_2,IRRADIANCE_2,DAMPNESS,PRESSURE) VALUES(?,?,?,?,?,?,?,?,?,?,?)";
 
                     DBConnection conn = SqlHelper.connPool.getConnection();
-                    Parameter[] params = new Parameter[51];
-                    Parameter[] params_new_data = new Parameter[48];
-                    Parameter[] params_metero_data = new Parameter[6];
+                    Parameter[] params = new Parameter[55];
+                    Parameter[] params_new_data = new Parameter[52];
+                    Parameter[] params_metero_data = new Parameter[11];
 
                     //逆变器数据采集历史表
                     String id = UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
                     COAL_SAVE = CO2_CUTS/2.493;
                     CONVERT_BENF = (0.42+0.3)*ELEC_PROD_YEAR;
+                    if ("1820FB1857737B3BA33A8FEE25164C98".equals(inverterId) || "4D5F552ED8CC4EE981720CBDDB7FEAC6".equals(inverterId)){
+                        FULL_HOURS_DAY = ELEC_PROD_DAILY/41.58;
+                        FULL_HOURS_MON = ELEC_PROD_MONTH/41.58;
+                        FULL_HOURS_YEAR = ELEC_PROD_YEAR/41.58;
+                        FULL_HOURS_ALL = ELEC_PROD_ALL/41.58;
+                    }else if ("6E5CEB1058E8A530A499DDC363A134C7".equals(inverterId)){
+                        FULL_HOURS_DAY = ELEC_PROD_DAILY/21.6;
+                        FULL_HOURS_MON = ELEC_PROD_MONTH/21.6;
+                        FULL_HOURS_YEAR = ELEC_PROD_YEAR/21.6;
+                        FULL_HOURS_ALL = ELEC_PROD_ALL/21.6;
+                    }else if ("6F31267F133D958AA4865C81AEA23225".equals(inverterId)){
+                        FULL_HOURS_DAY = ELEC_PROD_DAILY/38.88;
+                        FULL_HOURS_MON = ELEC_PROD_MONTH/38.88;
+                        FULL_HOURS_YEAR = ELEC_PROD_YEAR/38.88;
+                        FULL_HOURS_ALL = ELEC_PROD_ALL/38.88;
+                    }else if ("7CBE845153C74C3B798618B7F1F81D9D".equals(inverterId) || "FB003754389C03E09BAC593D694102E8".equals(inverterId) ||
+                            "FC8FC785AE2E7CF450BCFC876DABE6D8".equals(inverterId)){
+                        FULL_HOURS_DAY = ELEC_PROD_DAILY/29.7;
+                        FULL_HOURS_MON = ELEC_PROD_MONTH/29.7;
+                        FULL_HOURS_YEAR = ELEC_PROD_YEAR/29.7;
+                        FULL_HOURS_ALL = ELEC_PROD_ALL/29.7;
+                    }else if ("977767AE5E946563CA859C0AA980FA39".equals(inverterId)){
+                        FULL_HOURS_DAY = ELEC_PROD_DAILY/17.82;
+                        FULL_HOURS_MON = ELEC_PROD_MONTH/17.82;
+                        FULL_HOURS_YEAR = ELEC_PROD_YEAR/17.82;
+                        FULL_HOURS_ALL = ELEC_PROD_ALL/17.82;
+                    }else if ("AAA263543DC49259EBAED22960B4271F".equals(inverterId)){
+                        FULL_HOURS_DAY = ELEC_PROD_DAILY/18.15;
+                        FULL_HOURS_MON = ELEC_PROD_MONTH/18.15;
+                        FULL_HOURS_YEAR = ELEC_PROD_YEAR/18.15;
+                        FULL_HOURS_ALL = ELEC_PROD_ALL/18.15;
+                    }else if ("C697C5B7684DFC9E10045763AD9721F3".equals(inverterId)){
+                        FULL_HOURS_DAY = ELEC_PROD_DAILY/18;
+                        FULL_HOURS_MON = ELEC_PROD_MONTH/18;
+                        FULL_HOURS_YEAR = ELEC_PROD_YEAR/18;
+                        FULL_HOURS_ALL = ELEC_PROD_ALL/18;
+                    }else {
+                        FULL_HOURS_DAY = ELEC_PROD_DAILY/16.2;
+                        FULL_HOURS_MON = ELEC_PROD_MONTH/16.2;
+                        FULL_HOURS_YEAR = ELEC_PROD_YEAR/16.2;
+                        FULL_HOURS_ALL = ELEC_PROD_ALL/16.2;
+                    }
 
                     params[0] = new Parameter("ID", BaseTypes.VARCHAR,id);
                     params[1] = new Parameter("INVERTER_ID", BaseTypes.VARCHAR,INVERTER_ID);
@@ -160,6 +218,11 @@ public class YcObject {
                     params[48] = new Parameter("PRESSURE",BaseTypes.DECIMAL,new BigDecimal(PRESSURE).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
                     params[49] = new Parameter("WIND_SPEED",BaseTypes.DECIMAL,new BigDecimal(WIND_SPEED).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
                     params[50] = new Parameter("WIND_DIR",BaseTypes.DECIMAL,new BigDecimal(WIND_DIR).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[51] = new Parameter("FULL_HOURS_DAY",BaseTypes.DECIMAL,new BigDecimal(FULL_HOURS_DAY).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[52] = new Parameter("FULL_HOURS_MON",BaseTypes.DECIMAL,new BigDecimal(FULL_HOURS_MON).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[53] = new Parameter("FULL_HOURS_YEAR",BaseTypes.DECIMAL,new BigDecimal(FULL_HOURS_YEAR).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[54] = new Parameter("FULL_HOURS_ALL",BaseTypes.DECIMAL,new BigDecimal(FULL_HOURS_ALL).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+
 
                     //将数据存入逆变器实时数据表
                     params_new_data[0] = params[2];
@@ -208,17 +271,26 @@ public class YcObject {
                     params_new_data[43] = params[48];
                     params_new_data[44] = params[49];
                     params_new_data[45] = params[50];
-                    params_new_data[46] = new Parameter("TIME", BaseTypes.TIMESTAMP,new Timestamp(System.currentTimeMillis()));
-                    params_new_data[47] = params[1];
+                    params_new_data[46] = params[51];
+                    params_new_data[47] = params[52];
+                    params_new_data[48] = params[53];
+                    params_new_data[49] = params[54];
+                    params_new_data[50] = new Parameter("TIME", BaseTypes.TIMESTAMP,new Timestamp(System.currentTimeMillis()));
+                    params_new_data[51] = params[1];
 
                     //气象数据
                     String meteroId = UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
                     params_metero_data[0] = new Parameter("METERO_ID", BaseTypes.VARCHAR,meteroId);
-                    params_metero_data[1] = params[44];
-                    params_metero_data[2] = params[49];
-                    params_metero_data[3] = params[50];
-                    params_metero_data[4] = params[33];
-                    params_metero_data[5] = params[42];
+                    params_metero_data[1] = params[49];
+                    params_metero_data[2] = params[50];
+                    params_metero_data[3] = params[33];
+                    params_metero_data[4] = params[42];
+                    params_metero_data[5] = params[43];
+                    params_metero_data[6] = params[44];
+                    params_metero_data[7] = params[45];
+                    params_metero_data[8] = params[46];
+                    params_metero_data[9] = params[47];
+                    params_metero_data[10] = params[48];
 
                     try {
                         SqlHelper.executeNonQuery(conn, CommandType.Text, sql, params);
@@ -226,9 +298,7 @@ public class YcObject {
                         SqlHelper.executeNonQuery(conn, CommandType.Text, inverter_data_now, params_new_data);
                         //插入环境仪采集数据
                         SqlHelper.executeNonQuery(conn, CommandType.Text, metero_sql, params_metero_data);
-                        clear();
-                        log.debug("插入、更新遥测数据到对应的表中!");
-
+//                        clear();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -236,66 +306,157 @@ public class YcObject {
                 }else{
                     log.debug("未接收到数据");
                 }
-
             }
-
         };
+
         ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
         // 第二个参数为首次执行的延时时间，第三个参数为定时执行的间隔时间
         service.scheduleAtFixedRate(runnable, 360, 360, TimeUnit.SECONDS);
+
+        //websocket获取实时数据往前端页面上传
+        Configuration config = new Configuration();
+        config.setHostname("192.168.100.48");
+        config.setPort(9092);
+
+        final SocketIOServer server = new SocketIOServer(config);
+        server.addConnectListener(new ConnectListener() {
+            @Override
+            public void onConnect(SocketIOClient socketIOClient) {
+                clients.add(socketIOClient);
+                log.info("Client Address："+socketIOClient.getRemoteAddress()+"已连接");
+                log.info("Client Id："+socketIOClient.getSessionId().toString().replaceAll("-",""));
+            }
+        });
+
+        server.addDisconnectListener(new DisconnectListener() {
+            @Override
+            public void onDisconnect(SocketIOClient socketIOClient) {
+                clients.remove(socketIOClient);
+                log.info("Client Address："+socketIOClient.getRemoteAddress()+"已下线");
+            }
+        });
+        server.start();
+
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                server.getBroadcastOperations().sendEvent("inverterDataNow",generateYcData());
+            }
+        },0, 3000);
+
+        server.addEventListener("chatevent",Map.class,new DataListener<Map>(){
+            @Override
+            public void onData(SocketIOClient client, Map message, AckRequest ackRequest) {
+                // broadcast messages to all clients
+                server.getBroadcastOperations().sendEvent("string", message);
+                log.info(message);
+            }
+        });
     }
 
     public void clear(){
-        ELEC_PROD_HOUR=-1;
-        ELEC_PROD_DAILY=-1;
-        ELEC_PROD_MONTH=-1;
-        ELEC_PROD_YEAR=-1;
-        ELEC_PROD_ALL=-1;
-        OUTPUT_P=-1;
-        CONNECT_P=-1;
-        PEAK_POWER=-1;
-        REACTIVE_P=-1;
-        PV1_U=-1;
-        PV1_I=-1;
-        PV2_U=-1;
-        PV2_I=-1;
-        PV3_U=-1;
-        PV3_I=-1;
-        PV4_U=-1;
-        PV4_I=-1;
-        PV5_U=-1;
-        PV5_I=-1;
-        PV6_U=-1;
-        PV6_I=-1;
-        PV7_U=-1;
-        PV7_I=-1;
-        PV8_U=-1;
-        PV8_I=-1;
-        AC_UA=-1;
-        AC_UB=-1;
-        AC_UC=-1;
-        AC_IA=-1;
-        AC_IB=-1;
-        AC_IC=-1;
-        MACHINE_TEMP=-1;
-        GRID_FRQ=-1;
-        CONVERT_EFF=-1;
-        CO2_CUTS=-1;
-        COAL_SAVE=-1;
-        CONVERT_BENF=-1;
-        CONNECT_STATUS=-1;
-        PV_CONNECT_STATUS=-1;
-        WARNING_STATUS=-1;
-        AMBIENT_TEMP=-200;
-        RADIANT_QUANTITY_1=-1;
-        IRRADIANCE_1=-1;
-        RADIANT_QUANTITY_2=-1;
-        IRRADIANCE_2=-1;
-        DAMPNESS=-1;
-        PRESSURE=-1;
-        WIND_SPEED=-1;
-        WIND_DIR=-1;
+        ELEC_PROD_HOUR=0;
+        ELEC_PROD_DAILY=0;
+        ELEC_PROD_MONTH=0;
+        ELEC_PROD_YEAR=0;
+        ELEC_PROD_ALL=0;
+        OUTPUT_P=0;
+        CONNECT_P=0;
+        PEAK_POWER=0;
+        REACTIVE_P=0;
+        PV1_U=0;
+        PV1_I=0;
+        PV2_U=0;
+        PV2_I=0;
+        PV3_U=0;
+        PV3_I=0;
+        PV4_U=0;
+        PV4_I=0;
+        PV5_U=0;
+        PV5_I=0;
+        PV6_U=0;
+        PV6_I=0;
+        PV7_U=0;
+        PV7_I=0;
+        PV8_U=0;
+        PV8_I=0;
+        AC_UA=0;
+        AC_UB=0;
+        AC_UC=0;
+        AC_IA=0;
+        AC_IB=0;
+        AC_IC=0;
+        MACHINE_TEMP=0;
+        GRID_FRQ=0;
+        CONVERT_EFF=0;
+        CO2_CUTS=0;
+        COAL_SAVE=0;
+        CONVERT_BENF=0;
+        CONNECT_STATUS=0;
+        PV_CONNECT_STATUS=0;
+        WARNING_STATUS=0;
+        AMBIENT_TEMP=0;
+        RADIANT_QUANTITY_1=0;
+        IRRADIANCE_1=0;
+        RADIANT_QUANTITY_2=0;
+        IRRADIANCE_2=0;
+        DAMPNESS=0;
+        PRESSURE=0;
+        WIND_SPEED=0;
+        WIND_DIR=0;
         this.flag=false;
+    }
+
+    public JSONObject generateYcData(){
+        Map map = new HashMap();
+        map.put("INVERTER_ID", INVERTER_ID);
+        map.put("ELEC_PROD_HOUR", ELEC_PROD_HOUR);
+        map.put("ELEC_PROD_DAILY", ELEC_PROD_DAILY);
+        map.put("ELEC_PROD_ALL", ELEC_PROD_ALL);
+        map.put("OUTPUT_P", OUTPUT_P);
+        map.put("CONNECT_P", CONNECT_P);
+        map.put("PEAK_POWER", PEAK_POWER);
+        map.put("REACTIVE_P", REACTIVE_P);
+        map.put("PV1_U", PV1_U);
+        map.put("PV1_I", PV1_I);
+        map.put("PV2_U", PV2_U);
+        map.put("PV2_I", PV2_I);
+        map.put("PV3_U", PV3_U);
+        map.put("PV3_I", PV3_I);
+        map.put("PV4_U", PV4_U);
+        map.put("PV4_I", PV4_I);
+        map.put("PV5_U", PV5_U);
+        map.put("PV5_I", PV5_I);
+        map.put("PV6_U", PV6_U);
+        map.put("PV6_I", PV6_I);
+        map.put("PV7_U", PV7_U);
+        map.put("PV7_I", PV7_I);
+        map.put("PV8_U", PV8_U);
+        map.put("PV8_I", PV8_I);
+        map.put("AC_UA", AC_UA);
+        map.put("AC_UB", AC_UB);
+        map.put("AC_UC", AC_UC);
+        map.put("AC_IA", AC_IA);
+        map.put("AC_IB", AC_IB);
+        map.put("AC_IC", AC_IC);
+        map.put("MACHINE_TEMP", MACHINE_TEMP);
+        map.put("GRID_FRQ", GRID_FRQ);
+        map.put("CONVERT_EFF", CONVERT_EFF);
+        map.put("CO2_CUTS", CO2_CUTS);
+        map.put("COAL_SAVE", COAL_SAVE);
+        map.put("CONVERT_BENF", CONVERT_BENF);
+        map.put("AMBIENT_TEMP", AMBIENT_TEMP);
+        map.put("RADIANT_QUANTITY_1", RADIANT_QUANTITY_1);
+        map.put("IRRADIANCE_1", IRRADIANCE_1);
+        map.put("RADIANT_QUANTITY_2", RADIANT_QUANTITY_2);
+        map.put("IRRADIANCE_2", IRRADIANCE_2);
+        map.put("DAMPNESS", DAMPNESS);
+        map.put("PRESSURE", PRESSURE);
+        map.put("WIND_SPEED", WIND_SPEED);
+        map.put("WIND_DIR", WIND_DIR);
+        JSONObject jsonObject = JSONObject.fromObject(map);
+        return jsonObject;
     }
 
     public String getID() {
@@ -754,6 +915,42 @@ public class YcObject {
 
     public void setWIND_DIR(double WIND_DIR) {
         this.WIND_DIR = WIND_DIR;
+        this.flag=true;
+    }
+
+    public double getFULL_HOURS_DAY() {
+        return FULL_HOURS_DAY;
+    }
+
+    public void setFULL_HOURS_DAY(double FULL_HOURS_DAY) {
+        this.FULL_HOURS_DAY = FULL_HOURS_DAY;
+        this.flag=true;
+    }
+
+    public double getFULL_HOURS_MON() {
+        return FULL_HOURS_MON;
+    }
+
+    public void setFULL_HOURS_MON(double FULL_HOURS_MON) {
+        this.FULL_HOURS_MON = FULL_HOURS_MON;
+        this.flag=true;
+    }
+
+    public double getFULL_HOURS_YEAR() {
+        return FULL_HOURS_YEAR;
+    }
+
+    public void setFULL_HOURS_YEAR(double FULL_HOURS_YEAR) {
+        this.FULL_HOURS_YEAR = FULL_HOURS_YEAR;
+        this.flag=true;
+    }
+
+    public double getFULL_HOURS_ALL() {
+        return FULL_HOURS_ALL;
+    }
+
+    public void setFULL_HOURS_ALL(double FULL_HOURS_ALL) {
+        this.FULL_HOURS_ALL = FULL_HOURS_ALL;
         this.flag=true;
     }
 
