@@ -27,7 +27,7 @@ public class Init {
     }
 
     public static void initDb(){
-        SqlHelper.connPool = new DBConnectionPool(50);
+        SqlHelper.connPool = new DBConnectionPool(10);
     }
 
     public static void initBusinessData(){

@@ -1,34 +1,30 @@
 package com.visenergy.iec104;
 
-import com.corundumstudio.socketio.AckRequest;
-import com.corundumstudio.socketio.Configuration;
-import com.corundumstudio.socketio.SocketIOClient;
-import com.corundumstudio.socketio.SocketIOServer;
-import com.corundumstudio.socketio.listener.ConnectListener;
-import com.corundumstudio.socketio.listener.DataListener;
-import com.corundumstudio.socketio.listener.DisconnectListener;
 import com.flying.jdbc.SqlHelper;
 import com.flying.jdbc.data.CommandType;
 import com.flying.jdbc.data.Parameter;
 import com.flying.jdbc.db.type.BaseTypes;
 import com.flying.jdbc.util.DBConnection;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.visenergy.iec104.util.RabbitMqUtils;
 import net.sf.json.JSONObject;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Created by zhonghuan on 2017/7/25.
  */
 public class YcObject {
     private Log log = LogFactory.getLog(YcObject.class);
-    private static List<SocketIOClient> clients = new ArrayList<SocketIOClient>();
+
+    private static String RABBITMQ_QUEUE = "PV_YC";
 
     private String ID;
     private String INVERTER_ID;
@@ -86,6 +82,9 @@ public class YcObject {
     private double FULL_HOURS_YEAR=0;          //年满发小时数
     private double FULL_HOURS_ALL=0;           //累计满发小时数
     private boolean flag=false;
+
+    private Connection conn = null;
+    private Channel channel = null;
 
     public YcObject(String inverterId){
         this.INVERTER_ID = inverterId;
@@ -308,51 +307,6 @@ public class YcObject {
                 }
             }
         };
-
-        ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
-        // 第二个参数为首次执行的延时时间，第三个参数为定时执行的间隔时间
-        service.scheduleAtFixedRate(runnable, 360, 360, TimeUnit.SECONDS);
-
-        //websocket获取实时数据往前端页面上传
-        Configuration config = new Configuration();
-        config.setHostname("192.168.100.48");
-        config.setPort(9092);
-
-        final SocketIOServer server = new SocketIOServer(config);
-        server.addConnectListener(new ConnectListener() {
-            @Override
-            public void onConnect(SocketIOClient socketIOClient) {
-                clients.add(socketIOClient);
-                log.info("Client Address："+socketIOClient.getRemoteAddress()+"已连接");
-                log.info("Client Id："+socketIOClient.getSessionId().toString().replaceAll("-",""));
-            }
-        });
-
-        server.addDisconnectListener(new DisconnectListener() {
-            @Override
-            public void onDisconnect(SocketIOClient socketIOClient) {
-                clients.remove(socketIOClient);
-                log.info("Client Address："+socketIOClient.getRemoteAddress()+"已下线");
-            }
-        });
-        server.start();
-
-        Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                server.getBroadcastOperations().sendEvent("inverterDataNow",generateYcData());
-            }
-        },0, 3000);
-
-        server.addEventListener("chatevent",Map.class,new DataListener<Map>(){
-            @Override
-            public void onData(SocketIOClient client, Map message, AckRequest ackRequest) {
-                // broadcast messages to all clients
-                server.getBroadcastOperations().sendEvent("string", message);
-                log.info(message);
-            }
-        });
     }
 
     public void clear(){
@@ -484,6 +438,7 @@ public class YcObject {
     public void setELEC_PROD_HOUR(double ELEC_PROD_HOUR) {
         this.ELEC_PROD_HOUR = ELEC_PROD_HOUR;
         this.flag=true;
+        //sendRabbitMq("ELEC_PROD_HOUR",ELEC_PROD_HOUR);
     }
 
     public double getELEC_PROD_DAILY() {
@@ -907,6 +862,7 @@ public class YcObject {
     public void setWIND_SPEED(double WIND_SPEED) {
         this.WIND_SPEED = WIND_SPEED;
         this.flag=true;
+        sendRabbitMq("WIND_SPEED",WIND_SPEED);
     }
 
     public double getWIND_DIR() {
@@ -954,11 +910,37 @@ public class YcObject {
         this.flag=true;
     }
 
+    public Connection getConn() throws IOException, TimeoutException {
+        if(conn == null){
+            conn = RabbitMqUtils.newConnection();
+        }
+        return conn;
+    }
+
+    public Channel getChannel() throws IOException, TimeoutException {
+        if(channel == null){
+            channel = getConn().createChannel();
+        }
+        return channel;
+    }
+
     public boolean isFlag() {
         return flag;
     }
 
     public void setFlag(boolean flag) {
         this.flag = flag;
+    }
+
+    public void sendRabbitMq(String name,Object value){
+        JSONObject jsonObj = new JSONObject();
+        jsonObj.put(name,value);
+        try {
+            RabbitMqUtils.sendMq(getChannel(),RABBITMQ_QUEUE,jsonObj.toString());
+        } catch (IOException e) {
+            log.error("初始化RabbitMQ失败",e);
+        } catch (TimeoutException e) {
+            log.error("初始化RabbitMQ失败",e);
+        }
     }
 }

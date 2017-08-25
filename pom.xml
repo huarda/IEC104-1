@@ -35,5 +35,10 @@
             <artifactId>netty-socketio</artifactId>
             <version>1.7.7</version>
         </dependency>
+        <dependency>
+            <groupId>com.rabbitmq</groupId>
+            <artifactId>amqp-client</artifactId>
+            <version>4.2.0</version>
+        </dependency>
     </dependencies>
 </project>

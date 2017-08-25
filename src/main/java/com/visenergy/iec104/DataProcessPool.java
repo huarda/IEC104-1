@@ -28,13 +28,13 @@ public class DataProcessPool {
             String sql = "SELECT A.INVERTER_ID,A.SERIAL,A.BUILDING_ID FROM T_PVMANAGE_INVERTER A";
             List<Map> list = SqlHelper.executeQuery(conn,CommandType.Text,sql);
             for (int i = 0; i< list.size();i++){
-                ycPool.put((String) list.get(i).get("SERIAL"),new YcObject((String) list.get(i).get("INVERTER_ID")));
-                yxPool.put((String) list.get(i).get("SERIAL"),new YxObject((String) list.get(i).get("INVERTER_ID"),(String) list.get(i).get("BUILDING_ID")));
-                yxsPool.put((String) list.get(i).get("SERIAL"),new YxStatusObject((String) list.get(i).get("INVERTER_ID")));
+               ycPool.put((String) list.get(i).get("SERIAL"),new YcObject((String) list.get(i).get("INVERTER_ID")));
+               /*  yxPool.put((String) list.get(i).get("SERIAL"),new YxObject((String) list.get(i).get("INVERTER_ID"),(String) list.get(i).get("BUILDING_ID")));
+                yxsPool.put((String) list.get(i).get("SERIAL"),new YxStatusObject((String) list.get(i).get("INVERTER_ID")));*/
             }
-
+            System.out.println("1");
         } catch (Exception e) {
-            log.error(e);
+           e.printStackTrace();
         }
         SqlHelper.connPool.releaseConnection(conn);
     }

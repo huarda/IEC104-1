@@ -83,7 +83,7 @@ public class Asdu {
         byte[] cot = new byte[2];
         dataInputStream.readFully(cot);
         //传送原因
-        causeOfTransmission = Integer.parseInt(ChangeUtils.byteAppend(cot),16);
+        causeOfTransmission = Integer.parseInt(ChangeUtils.byteAppend(cot),10);
         log.debug("传送原因：" + Init.causeProp.getProperty(String.valueOf(causeOfTransmission)));
         //公共地址
         byte[] commAddress = new byte[2];
