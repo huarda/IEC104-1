@@ -9,6 +9,7 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.visenergy.iec104.util.RabbitMqUtils;
 import net.sf.json.JSONObject;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -28,6 +29,7 @@ public class YcObject {
 
     private String ID;
     private String INVERTER_ID;
+    private String SERIAL;
     private double ELEC_PROD_HOUR=0;
     private double ELEC_PROD_DAILY=0;
     private double ELEC_PROD_MONTH=0;
@@ -429,6 +431,14 @@ public class YcObject {
     public void setINVERTER_ID(String INVERTER_ID) {
         this.INVERTER_ID = INVERTER_ID;
         this.flag=true;
+    }
+
+    public String getSERIAL() {
+        return SERIAL;
+    }
+
+    public void setSERIAL(String SERIAL) {
+        this.SERIAL = SERIAL;
     }
 
     public double getELEC_PROD_HOUR() {
@@ -933,10 +943,17 @@ public class YcObject {
     }
 
     public void sendRabbitMq(String name,Object value){
-        JSONObject jsonObj = new JSONObject();
-        jsonObj.put(name,value);
+        Map<String,Object> resultMap = new HashedMap();
+        resultMap.put("module","lightTopology");
+        resultMap.put("subModule","topologyData");
+
+        Map<String,Object> dataMap = new HashedMap();
+        dataMap.put(name,value);
+
+        resultMap.put("data",dataMap);
+
         try {
-            RabbitMqUtils.sendMq(getChannel(),RABBITMQ_QUEUE,jsonObj.toString());
+            RabbitMqUtils.sendMq(getChannel(),RABBITMQ_QUEUE,JSONObject.fromObject(resultMap).toString());
         } catch (IOException e) {
             log.error("初始化RabbitMQ失败",e);
         } catch (TimeoutException e) {
