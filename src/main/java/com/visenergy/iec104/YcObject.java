@@ -88,8 +88,10 @@ public class YcObject {
     private Connection conn = null;
     private Channel channel = null;
 
-    public YcObject(String inverterId){
+    public YcObject(String inverterId,String serial){
         this.INVERTER_ID = inverterId;
+        this.SERIAL = serial;
+
         Runnable runnable = new Runnable() {
 
             public void run() {
@@ -364,7 +366,7 @@ public class YcObject {
         this.flag=false;
     }
 
-    public JSONObject generateYcData(){
+    public JSONObject toJsonString(){
         Map map = new HashMap();
         map.put("INVERTER_ID", INVERTER_ID);
         map.put("ELEC_PROD_HOUR", ELEC_PROD_HOUR);
@@ -458,6 +460,12 @@ public class YcObject {
     public void setELEC_PROD_DAILY(double ELEC_PROD_DAILY) {
         this.ELEC_PROD_DAILY = ELEC_PROD_DAILY;
         this.flag=true;
+
+        Map map = new HashedMap();
+        map.put("name","SERIAL");
+        map.put("SERIAL",getSERIAL());
+        map.put("ELEC_PROD_DAILY",new BigDecimal(ELEC_PROD_DAILY).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+        sendRabbitMq("lightTopology","inverterData",map);
     }
 
     public double getELEC_PROD_MONTH() {
@@ -809,6 +817,9 @@ public class YcObject {
     public void setAMBIENT_TEMP(double AMBIENT_TEMP) {
         this.AMBIENT_TEMP = AMBIENT_TEMP;
         this.flag=true;
+        Map map = new HashedMap();
+        map.put("AMBIENT_TEMP",new BigDecimal(AMBIENT_TEMP).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+        sendRabbitMq("lightTopology","topologyData",map);
     }
 
     public double getRADIANT_QUANTITY_1() {
@@ -818,6 +829,9 @@ public class YcObject {
     public void setRADIANT_QUANTITY_1(double RADIANT_QUANTITY_1) {
         this.RADIANT_QUANTITY_1 = RADIANT_QUANTITY_1;
         this.flag=true;
+        Map map = new HashedMap();
+        map.put("RADIANT_QUANTITY_1",new BigDecimal(RADIANT_QUANTITY_1).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+        sendRabbitMq("lightTopology","topologyData",map);
     }
 
     public double getIRRADIANCE_1() {
@@ -836,6 +850,9 @@ public class YcObject {
     public void setRADIANT_QUANTITY_2(double RADIANT_QUANTITY_2) {
         this.RADIANT_QUANTITY_2 = RADIANT_QUANTITY_2;
         this.flag=true;
+        Map map = new HashedMap();
+        map.put("RADIANT_QUANTITY_2",new BigDecimal(RADIANT_QUANTITY_2).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+        sendRabbitMq("lightTopology","topologyData",map);
     }
 
     public double getIRRADIANCE_2() {
@@ -854,6 +871,9 @@ public class YcObject {
     public void setDAMPNESS(double DAMPNESS) {
         this.DAMPNESS = DAMPNESS;
         this.flag=true;
+        Map map = new HashedMap();
+        map.put("DAMPNESS",new BigDecimal(DAMPNESS).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+        sendRabbitMq("lightTopology","topologyData",map);
     }
 
     public double getPRESSURE() {
@@ -872,7 +892,9 @@ public class YcObject {
     public void setWIND_SPEED(double WIND_SPEED) {
         this.WIND_SPEED = WIND_SPEED;
         this.flag=true;
-        sendRabbitMq("WIND_SPEED",WIND_SPEED);
+        Map map = new HashedMap();
+        map.put("WIND_SPEED",new BigDecimal(WIND_SPEED).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+        sendRabbitMq("lightTopology","topologyData",map);
     }
 
     public double getWIND_DIR() {
@@ -882,6 +904,9 @@ public class YcObject {
     public void setWIND_DIR(double WIND_DIR) {
         this.WIND_DIR = WIND_DIR;
         this.flag=true;
+        Map map = new HashedMap();
+        map.put("WIND_DIR",new BigDecimal(WIND_DIR).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+        sendRabbitMq("lightTopology","topologyData",map);
     }
 
     public double getFULL_HOURS_DAY() {
@@ -942,14 +967,10 @@ public class YcObject {
         this.flag = flag;
     }
 
-    public void sendRabbitMq(String name,Object value){
+    public void sendRabbitMq(String module,String subModule,Map dataMap){
         Map<String,Object> resultMap = new HashedMap();
-        resultMap.put("module","lightTopology");
-        resultMap.put("subModule","topologyData");
-
-        Map<String,Object> dataMap = new HashedMap();
-        dataMap.put(name,value);
-
+        resultMap.put("module",module);
+        resultMap.put("subModule",subModule);
         resultMap.put("data",dataMap);
 
         try {

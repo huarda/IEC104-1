@@ -1,5 +1,7 @@
 package com.visenergy.iec104.util;
 
+import com.visenergy.iec104.IeShortFloat;
+
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -56,6 +58,12 @@ public class ChangeUtils {
             stringBuffer.append(String.format("%02d",bytes[i]));
         }
         return stringBuffer.toString();
+    }
+
+    public static String floatToHexstr(float value){
+        byte[] buffer = new byte[4];
+        new IeShortFloat(value).encode(buffer,0);
+        return toHexString(buffer);
     }
 
     private static int startSendNum  =  1;

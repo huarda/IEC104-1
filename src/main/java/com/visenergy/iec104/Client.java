@@ -21,7 +21,7 @@ public class Client {
 		try {
             new Init();
 			// 向本机的4700端口发出客户请求
-			Socket socket = new Socket("192.168.100.33", 2405);
+			Socket socket = new Socket("127.0.0.1", 2405);
 			
 			// 由Socket对象得到输出流，并构造PrintWriter对象
 			OutputStream os = socket.getOutputStream();

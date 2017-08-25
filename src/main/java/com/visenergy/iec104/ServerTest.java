@@ -1,11 +1,16 @@
 package com.visenergy.iec104;
 
+import com.visenergy.iec104.util.ChangeUtils;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Administrator on 2017/8/23 0023.
@@ -44,6 +49,26 @@ public class ServerTest {
             // 在标准输出上打印从客户端读入的字符串
            OutputStream os = socket.getOutputStream();
 
+            Runnable runnable = new Runnable() {
+                public void run() {
+                    try {
+                        String pstr = GenerateHourDate.getProtocalStr();
+
+                        String[] ls = pstr.split(" ");
+
+                        System.out.println(pstr);
+                        for (int i = 0; i < ls.length; i++) {
+                            os.write((byte)Integer.parseInt(ls[i],16));
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            };
+            ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
+            // 第二个参数为首次执行的延时时间，第三个参数为定时执行的间隔时间
+            service.scheduleAtFixedRate(runnable, 0, 2000, TimeUnit.SECONDS);
+
             // 如果该字符串为 "bye"，则停止循环
             String line = is.readLine();
 
@@ -57,7 +82,6 @@ public class ServerTest {
                 line = is.readLine();
 
             } // 继续循环
-
             os.close(); // 关闭Socket输出流
 
             is.close(); // 关闭Socket输入流

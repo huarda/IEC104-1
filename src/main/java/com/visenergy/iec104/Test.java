@@ -34,9 +34,9 @@ public class Test {
         DataInputStream dis = new DataInputStream(new ByteArrayInputStream(bytes));
         Apdu apdu = new Apdu(dis);
 */
-/*       IeShortFloat isf = new IeShortFloat(9.15f);
+       IeShortFloat isf = new IeShortFloat(557.5f);
         byte[] b = new byte[4];
         isf.encode(b,0);
-        System.out.println(ChangeUtils.toHexString(b));*/
+        System.out.println(String.format("%02d",ChangeUtils.toHexString(b)));
     }
 }

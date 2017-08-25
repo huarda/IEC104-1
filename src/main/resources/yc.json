@@ -106,7 +106,7 @@
   "16488":{"name":"","type":"DECIMAL","description":"101-2N 关机时间"},
 
   "16489":{"name":"RADIANT_QUANTITY_1","type":"DECIMAL","description":"辐射量1"},
-  "16490":{"name":"IRRADIANCE_1=","type":"DECIMAL","description":"辐照度1"},
+  "16490":{"name":"IRRADIANCE_1","type":"DECIMAL","description":"辐照度1"},
   "16491":{"name":"RADIANT_QUANTITY_2","type":"DECIMAL","description":"辐射量2"},
   "16492":{"name":"IRRADIANCE_2","type":"DECIMAL","description":"辐照度2"},
   "16493":{"name":"AMBIENT_TEMP","type":"DECIMAL","description":"温度"},
