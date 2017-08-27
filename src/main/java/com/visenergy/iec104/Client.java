@@ -19,7 +19,6 @@ public class Client {
 	public static void main(String args[]) {
 
 		try {
-            new Init();
 			// 向本机的4700端口发出客户请求
 			Socket socket = new Socket("127.0.0.1", 2405);
 			

@@ -66,6 +66,26 @@ public class ChangeUtils {
         return toHexString(buffer);
     }
 
+    public static String encode(float value){
+        int tempVal = Float.floatToIntBits(value);
+        byte[] buffer = new byte[4];
+        buffer[0] = (byte) tempVal;
+        buffer[1] = (byte) (tempVal >> 8);
+        buffer[2] = (byte) (tempVal >> 16);
+        buffer[3] = (byte) (tempVal >> 24);
+        int[] s = new int[4];
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < buffer.length; i++){
+            s[i] = (buffer[i] & 0xff);
+            if (Integer.toHexString(s[i]).length() == 1){
+                sb.append("0" + Integer.toHexString(s[i]) + " ");
+            }else {
+                sb.append(Integer.toHexString(s[i]) + " ");
+            }
+        }
+        return sb.toString();
+    }
+
     private static int startSendNum  =  1;
 
     public static void main(String[] args) {

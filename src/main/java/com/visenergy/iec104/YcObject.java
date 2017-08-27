@@ -92,6 +92,15 @@ public class YcObject {
         this.INVERTER_ID = inverterId;
         this.SERIAL = serial;
 
+        //初始化rabbitmq
+        try {
+            this.getChannel();
+        } catch (IOException e) {
+            log.error("初始化rabbitMq失败",e);
+        } catch (TimeoutException e) {
+            log.error("初始化rabbitMq失败",e);
+        }
+
         Runnable runnable = new Runnable() {
 
             public void run() {
@@ -450,7 +459,7 @@ public class YcObject {
     public void setELEC_PROD_HOUR(double ELEC_PROD_HOUR) {
         this.ELEC_PROD_HOUR = ELEC_PROD_HOUR;
         this.flag=true;
-        //sendRabbitMq("ELEC_PROD_HOUR",ELEC_PROD_HOUR);
+        this.sendRabbitMq("SERIAL","ELEC_PROD_HOUR",new BigDecimal(ELEC_PROD_HOUR).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
     }
 
     public double getELEC_PROD_DAILY() {
@@ -460,12 +469,7 @@ public class YcObject {
     public void setELEC_PROD_DAILY(double ELEC_PROD_DAILY) {
         this.ELEC_PROD_DAILY = ELEC_PROD_DAILY;
         this.flag=true;
-
-        Map map = new HashedMap();
-        map.put("name","SERIAL");
-        map.put("SERIAL",getSERIAL());
-        map.put("ELEC_PROD_DAILY",new BigDecimal(ELEC_PROD_DAILY).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-        sendRabbitMq("lightTopology","inverterData",map);
+        this.sendRabbitMq("SERIAL","ELEC_PROD_DAILY",new BigDecimal(ELEC_PROD_DAILY).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
     }
 
     public double getELEC_PROD_MONTH() {
@@ -475,6 +479,7 @@ public class YcObject {
     public void setELEC_PROD_MONTH(double ELEC_PROD_MONTH) {
         this.ELEC_PROD_MONTH = ELEC_PROD_MONTH;
         this.flag=true;
+        this.sendRabbitMq("SERIAL","ELEC_PROD_MONTH",new BigDecimal(ELEC_PROD_MONTH).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
     }
 
     public double getELEC_PROD_YEAR() {
@@ -484,6 +489,7 @@ public class YcObject {
     public void setELEC_PROD_YEAR(double ELEC_PROD_YEAR) {
         this.ELEC_PROD_YEAR = ELEC_PROD_YEAR;
         this.flag=true;
+        this.sendRabbitMq("SERIAL","ELEC_PROD_YEAR",new BigDecimal(ELEC_PROD_YEAR).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
     }
 
     public double getELEC_PROD_ALL() {
@@ -493,6 +499,7 @@ public class YcObject {
     public void setELEC_PROD_ALL(double ELEC_PROD_ALL) {
         this.ELEC_PROD_ALL = ELEC_PROD_ALL;
         this.flag=true;
+        this.sendRabbitMq("SERIAL","ELEC_PROD_ALL",new BigDecimal(ELEC_PROD_ALL).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
     }
 
     public double getOUTPUT_P() {
@@ -502,6 +509,8 @@ public class YcObject {
     public void setOUTPUT_P(double OUTPUT_P) {
         this.OUTPUT_P = OUTPUT_P;
         this.flag=true;
+        this.sendRabbitMq("SERIAL","OUTPUT_P",new BigDecimal(OUTPUT_P).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+
     }
 
     public double getCONNECT_P() {
@@ -529,6 +538,8 @@ public class YcObject {
     public void setREACTIVE_P(double REACTIVE_P) {
         this.REACTIVE_P = REACTIVE_P;
         this.flag=true;
+        this.sendRabbitMq("SERIAL","REACTIVE_P",new BigDecimal(REACTIVE_P).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+
     }
 
     public double getPV1_U() {
@@ -754,6 +765,8 @@ public class YcObject {
     public void setCONVERT_EFF(double CONVERT_EFF) {
         this.CONVERT_EFF = CONVERT_EFF;
         this.flag=true;
+        this.sendRabbitMq("SERIAL","CONVERT_EFF",new BigDecimal(CONVERT_EFF).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+
     }
 
     public double getCO2_CUTS() {
@@ -763,6 +776,7 @@ public class YcObject {
     public void setCO2_CUTS(double CO2_CUTS) {
         this.CO2_CUTS = CO2_CUTS;
         this.flag=true;
+        this.sendRabbitMq("SERIAL","CO2_CUTS",new BigDecimal(CO2_CUTS).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
     }
 
     public double getCOAL_SAVE() {
@@ -817,9 +831,7 @@ public class YcObject {
     public void setAMBIENT_TEMP(double AMBIENT_TEMP) {
         this.AMBIENT_TEMP = AMBIENT_TEMP;
         this.flag=true;
-        Map map = new HashedMap();
-        map.put("AMBIENT_TEMP",new BigDecimal(AMBIENT_TEMP).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-        sendRabbitMq("lightTopology","topologyData",map);
+        sendRabbitMq("AMBIENT_TEMP",new BigDecimal(AMBIENT_TEMP).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
     }
 
     public double getRADIANT_QUANTITY_1() {
@@ -829,9 +841,7 @@ public class YcObject {
     public void setRADIANT_QUANTITY_1(double RADIANT_QUANTITY_1) {
         this.RADIANT_QUANTITY_1 = RADIANT_QUANTITY_1;
         this.flag=true;
-        Map map = new HashedMap();
-        map.put("RADIANT_QUANTITY_1",new BigDecimal(RADIANT_QUANTITY_1).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-        sendRabbitMq("lightTopology","topologyData",map);
+        sendRabbitMq("RADIANT_QUANTITY_1",new BigDecimal(RADIANT_QUANTITY_1).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
     }
 
     public double getIRRADIANCE_1() {
@@ -850,9 +860,7 @@ public class YcObject {
     public void setRADIANT_QUANTITY_2(double RADIANT_QUANTITY_2) {
         this.RADIANT_QUANTITY_2 = RADIANT_QUANTITY_2;
         this.flag=true;
-        Map map = new HashedMap();
-        map.put("RADIANT_QUANTITY_2",new BigDecimal(RADIANT_QUANTITY_2).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-        sendRabbitMq("lightTopology","topologyData",map);
+        sendRabbitMq("RADIANT_QUANTITY_2",new BigDecimal(RADIANT_QUANTITY_2).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
     }
 
     public double getIRRADIANCE_2() {
@@ -871,9 +879,7 @@ public class YcObject {
     public void setDAMPNESS(double DAMPNESS) {
         this.DAMPNESS = DAMPNESS;
         this.flag=true;
-        Map map = new HashedMap();
-        map.put("DAMPNESS",new BigDecimal(DAMPNESS).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-        sendRabbitMq("lightTopology","topologyData",map);
+        sendRabbitMq("DAMPNESS",new BigDecimal(DAMPNESS).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
     }
 
     public double getPRESSURE() {
@@ -892,9 +898,7 @@ public class YcObject {
     public void setWIND_SPEED(double WIND_SPEED) {
         this.WIND_SPEED = WIND_SPEED;
         this.flag=true;
-        Map map = new HashedMap();
-        map.put("WIND_SPEED",new BigDecimal(WIND_SPEED).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-        sendRabbitMq("lightTopology","topologyData",map);
+        sendRabbitMq("WIND_SPEED",new BigDecimal(WIND_SPEED).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
     }
 
     public double getWIND_DIR() {
@@ -904,9 +908,7 @@ public class YcObject {
     public void setWIND_DIR(double WIND_DIR) {
         this.WIND_DIR = WIND_DIR;
         this.flag=true;
-        Map map = new HashedMap();
-        map.put("WIND_DIR",new BigDecimal(WIND_DIR).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-        sendRabbitMq("lightTopology","topologyData",map);
+        sendRabbitMq("WIND_DIR",new BigDecimal(WIND_DIR).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
     }
 
     public double getFULL_HOURS_DAY() {
@@ -967,6 +969,21 @@ public class YcObject {
         this.flag = flag;
     }
 
+    public void sendRabbitMq(String name,Object value) {
+        Map map = new HashedMap();
+        map.put(name,value);
+        sendRabbitMq("lightTopology","topologyData",map);
+    }
+
+    public void sendRabbitMq(String ID,String name,Object value){
+        Map map = new HashedMap();
+        map.put("name",ID);
+        map.put("SERIAL",getSERIAL());
+        map.put(name,value);
+        sendRabbitMq("lightTopology","inverterData",map);
+    }
+
+
     public void sendRabbitMq(String module,String subModule,Map dataMap){
         Map<String,Object> resultMap = new HashedMap();
         resultMap.put("module",module);
@@ -974,11 +991,11 @@ public class YcObject {
         resultMap.put("data",dataMap);
 
         try {
-            RabbitMqUtils.sendMq(getChannel(),RABBITMQ_QUEUE,JSONObject.fromObject(resultMap).toString());
+            RabbitMqUtils.sendMq(channel,RABBITMQ_QUEUE,JSONObject.fromObject(resultMap).toString());
         } catch (IOException e) {
-            log.error("初始化RabbitMQ失败",e);
+           log.error("RabbitMq传输消息失败",e);
         } catch (TimeoutException e) {
-            log.error("初始化RabbitMQ失败",e);
+            log.error("RabbitMq传输消息失败",e);
         }
     }
 }

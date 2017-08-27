@@ -1,11 +1,8 @@
 package com.visenergy.iec104;
 
-import com.visenergy.iec104.util.ChangeUtils;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.Executors;
@@ -52,14 +49,25 @@ public class ServerTest {
             Runnable runnable = new Runnable() {
                 public void run() {
                     try {
-                        String pstr = GenerateHourDate.getProtocalStr();
+                        //生成一组
+                        String pstr1 = GenerateDate.getMinuatesData1();
 
-                        String[] ls = pstr.split(" ");
+                        String[] ls1 = pstr1.split(" ");
 
-                        System.out.println(pstr);
-                        for (int i = 0; i < ls.length; i++) {
-                            os.write((byte)Integer.parseInt(ls[i],16));
+                        System.out.println(pstr1);
+                        for (int i = 0; i < ls1.length; i++) {
+                            os.write((byte)Integer.parseInt(ls1[i],16));
                         }
+                        //生成二组
+                        String pstr2 = GenerateDate.getMinuatesData2();
+
+                        String[] ls2 = pstr2.split(" ");
+
+                        System.out.println(pstr2);
+                        for (int i = 0; i < ls2.length; i++) {
+                            os.write((byte)Integer.parseInt(ls2[i],16));
+                        }
+
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -67,9 +75,9 @@ public class ServerTest {
             };
             ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
             // 第二个参数为首次执行的延时时间，第三个参数为定时执行的间隔时间
-            service.scheduleAtFixedRate(runnable, 0, 2000, TimeUnit.SECONDS);
+            service.scheduleAtFixedRate(runnable, 0, 30, TimeUnit.SECONDS);
 
-            // 如果该字符串为 "bye"，则停止循环
+            /*// 如果该字符串为 "bye"，则停止循环
             String line = is.readLine();
 
             while (!line.equals("bye")) {
@@ -88,7 +96,7 @@ public class ServerTest {
 
             socket.close(); // 关闭Socket
 
-            server.close(); // 关闭ServerSocket
+            server.close(); // 关闭ServerSocket*/
 
         } catch (Exception e) {
 
