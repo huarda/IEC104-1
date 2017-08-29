@@ -83,7 +83,26 @@ public class ChangeUtils {
                 sb.append(Integer.toHexString(s[i]) + " ");
             }
         }
-        return sb.toString();
+        return sb.toString().toUpperCase();
+    }
+
+    public static String encodeInfomationAddress(int address) {
+        byte[] buffer = new byte[3];
+        buffer[0] = (byte) address;
+        buffer[1] = (byte) (address >> 8);
+        buffer[2] = (byte) (address >> 16);
+
+        int[] s = new int[4];
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < buffer.length; i++){
+            s[i] = (buffer[i] & 0xff);
+            if (Integer.toHexString(s[i]).length() == 1){
+                sb.append("0" + Integer.toHexString(s[i]) + " ");
+            }else {
+                sb.append(Integer.toHexString(s[i]) + " ");
+            }
+        }
+        return sb.toString().toUpperCase();
     }
 
     private static int startSendNum  =  1;

@@ -520,6 +520,7 @@ public class YcObject {
     public void setCONNECT_P(double CONNECT_P) {
         this.CONNECT_P = CONNECT_P;
         this.flag=true;
+        this.sendRabbitMq("SERIAL","CONNECT_P",new BigDecimal(CONNECT_P).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
     }
 
     public double getPEAK_POWER() {
@@ -529,6 +530,7 @@ public class YcObject {
     public void setPEAK_POWER(double PEAK_POWER) {
         this.PEAK_POWER = PEAK_POWER;
         this.flag=true;
+        this.sendRabbitMq("SERIAL","PEAK_POWER",new BigDecimal(PEAK_POWER).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
     }
 
     public double getREACTIVE_P() {
@@ -549,6 +551,7 @@ public class YcObject {
     public void setPV1_U(double PV1_U) {
         this.PV1_U = PV1_U;
         this.flag=true;
+        this.sendRabbitMq("SERIAL","PV1_U",new BigDecimal(PV1_U).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
     }
 
     public double getPV1_I() {
@@ -558,6 +561,7 @@ public class YcObject {
     public void setPV1_I(double PV1_I) {
         this.PV1_I = PV1_I;
         this.flag=true;
+        this.sendRabbitMq("SERIAL","PV1_I",new BigDecimal(PV1_I).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
     }
 
     public double getPV2_U() {
@@ -693,6 +697,7 @@ public class YcObject {
     public void setAC_UA(double AC_UA) {
         this.AC_UA = AC_UA;
         this.flag=true;
+        this.sendRabbitMq("SERIAL","AC_UA",new BigDecimal(AC_UA).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
     }
 
     public double getAC_UB() {
@@ -702,6 +707,7 @@ public class YcObject {
     public void setAC_UB(double AC_UB) {
         this.AC_UB = AC_UB;
         this.flag=true;
+        this.sendRabbitMq("SERIAL","AC_UB",new BigDecimal(AC_UB).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
     }
 
     public double getAC_UC() {
@@ -711,6 +717,7 @@ public class YcObject {
     public void setAC_UC(double AC_UC) {
         this.AC_UC = AC_UC;
         this.flag=true;
+        this.sendRabbitMq("SERIAL","AC_UC",new BigDecimal(AC_UC).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
     }
 
     public double getAC_IA() {
@@ -720,6 +727,7 @@ public class YcObject {
     public void setAC_IA(double AC_IA) {
         this.AC_IA = AC_IA;
         this.flag=true;
+        this.sendRabbitMq("SERIAL","AC_IA",new BigDecimal(AC_IA).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
     }
 
     public double getAC_IB() {
@@ -729,6 +737,7 @@ public class YcObject {
     public void setAC_IB(double AC_IB) {
         this.AC_IB = AC_IB;
         this.flag=true;
+        this.sendRabbitMq("SERIAL","AC_IB",new BigDecimal(AC_IB).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
     }
 
     public double getAC_IC() {
@@ -738,6 +747,7 @@ public class YcObject {
     public void setAC_IC(double AC_IC) {
         this.AC_IC = AC_IC;
         this.flag=true;
+        this.sendRabbitMq("SERIAL","AC_IC",new BigDecimal(AC_IC).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
     }
 
     public double getMACHINE_TEMP() {
@@ -747,6 +757,7 @@ public class YcObject {
     public void setMACHINE_TEMP(double MACHINE_TEMP) {
         this.MACHINE_TEMP = MACHINE_TEMP;
         this.flag=true;
+        this.sendRabbitMq("SERIAL","MACHINE_TEMP",new BigDecimal(MACHINE_TEMP).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
     }
 
     public double getGRID_FRQ() {
@@ -851,6 +862,7 @@ public class YcObject {
     public void setIRRADIANCE_1(double IRRADIANCE_1) {
         this.IRRADIANCE_1 = IRRADIANCE_1;
         this.flag=true;
+        sendRabbitMq("IRRADIANCE_1",new BigDecimal(IRRADIANCE_1).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
     }
 
     public double getRADIANT_QUANTITY_2() {
@@ -870,6 +882,7 @@ public class YcObject {
     public void setIRRADIANCE_2(double IRRADIANCE_2) {
         this.IRRADIANCE_2 = IRRADIANCE_2;
         this.flag=true;
+        sendRabbitMq("IRRADIANCE_2",new BigDecimal(IRRADIANCE_2).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
     }
 
     public double getDAMPNESS() {
@@ -889,6 +902,7 @@ public class YcObject {
     public void setPRESSURE(double PRESSURE) {
         this.PRESSURE = PRESSURE;
         this.flag=true;
+        sendRabbitMq("PRESSURE",new BigDecimal(PRESSURE).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
     }
 
     public double getWIND_SPEED() {

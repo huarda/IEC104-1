@@ -50,7 +50,7 @@ public class ServerTest {
                 public void run() {
                     try {
                         //生成一组
-                        String pstr1 = GenerateDate.getMinuatesData1();
+                        String pstr1 = GenerateDate.getMinuatesData1().trim();
 
                         String[] ls1 = pstr1.split(" ");
 
@@ -59,13 +59,94 @@ public class ServerTest {
                             os.write((byte)Integer.parseInt(ls1[i],16));
                         }
                         //生成二组
-                        String pstr2 = GenerateDate.getMinuatesData2();
+                        String pstr2 = GenerateDate.getMinuatesData2().trim();
 
                         String[] ls2 = pstr2.split(" ");
 
                         System.out.println(pstr2);
                         for (int i = 0; i < ls2.length; i++) {
                             os.write((byte)Integer.parseInt(ls2[i],16));
+                        }
+                        //生成3组
+                        String pstr3 = GenerateDate.getMinuatesData3().trim();
+
+                        String[] ls3 = pstr3.split(" ");
+
+                        System.out.println(pstr3);
+                        for (int i = 0; i < ls3.length; i++) {
+                            os.write((byte)Integer.parseInt(ls3[i],16));
+                        }
+                        //生成4组
+                        String pstr4 = GenerateDate.getMinuatesData4();
+
+                        String[] ls4 = pstr4.split(" ");
+
+                        System.out.println(pstr4);
+                        for (int i = 0; i < ls4.length; i++) {
+                            os.write((byte)Integer.parseInt(ls4[i],16));
+                        }
+                        //生成5组
+                        String pstr5 = GenerateDate.getMinuatesData5();
+
+                        String[] ls5 = pstr5.split(" ");
+
+                        System.out.println(pstr5);
+                        for (int i = 0; i < ls5.length; i++) {
+                            os.write((byte)Integer.parseInt(ls5[i],16));
+                        }
+                        //生成6组
+                        String pstr6 = GenerateDate.getMinuatesData6();
+
+                        String[] ls6 = pstr6.split(" ");
+
+                        System.out.println(pstr6);
+                        for (int i = 0; i < ls6.length; i++) {
+                            os.write((byte)Integer.parseInt(ls6[i],16));
+                        }
+                        //生成7组
+                        String pstr7 = GenerateDate.getMinuatesData7();
+
+                        String[] ls7 = pstr7.split(" ");
+
+                        System.out.println(pstr7);
+                        for (int i = 0; i < ls7.length; i++) {
+                            os.write((byte)Integer.parseInt(ls7[i],16));
+                        }
+                        //生成8组
+                        String pstr8 = GenerateDate.getMinuatesData8();
+
+                        String[] ls8 = pstr8.split(" ");
+
+                        System.out.println(pstr8);
+                        for (int i = 0; i < ls8.length; i++) {
+                            os.write((byte)Integer.parseInt(ls8[i],16));
+                        }
+                        //生成9组
+                        String pstr9 = GenerateDate.getMinuatesData9();
+
+                        String[] ls9 = pstr9.split(" ");
+
+                        System.out.println(pstr9);
+                        for (int i = 0; i < ls9.length; i++) {
+                            os.write((byte)Integer.parseInt(ls9[i],16));
+                        }
+                        //生成10组
+                        String pstr10 = GenerateDate.getMinuatesData10();
+
+                        String[] ls10 = pstr10.split(" ");
+
+                        System.out.println(pstr10);
+                        for (int i = 0; i < ls10.length; i++) {
+                            os.write((byte)Integer.parseInt(ls10[i],16));
+                        }
+                        //生成11组
+                        String pstr11 = GenerateDate.getMinuatesData11();
+
+                        String[] ls11 = pstr11.split(" ");
+
+                        System.out.println(pstr11);
+                        for (int i = 0; i < ls11.length; i++) {
+                            os.write((byte)Integer.parseInt(ls11[i],16));
                         }
 
                     } catch (Exception e) {
