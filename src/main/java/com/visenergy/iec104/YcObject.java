@@ -134,7 +134,7 @@ public class YcObject {
 
                     //逆变器数据采集历史表
                     String id = UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
-                    COAL_SAVE = CO2_CUTS/2.493;
+                    COAL_SAVE = ELEC_PROD_ALL*0.4;
                     CONVERT_BENF = (0.42+0.3)*ELEC_PROD_YEAR;
                     if ("1820FB1857737B3BA33A8FEE25164C98".equals(inverterId) || "4D5F552ED8CC4EE981720CBDDB7FEAC6".equals(inverterId)){
                         FULL_HOURS_DAY = ELEC_PROD_DAILY/41.58;
