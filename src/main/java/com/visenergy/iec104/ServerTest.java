@@ -148,6 +148,25 @@ public class ServerTest {
                         for (int i = 0; i < ls11.length; i++) {
                             os.write((byte)Integer.parseInt(ls11[i],16));
                         }
+                        //生成1组
+                        String ys1 = GenerateYxStatus.getMinuatesData();
+
+                        String[] lis1 = ys1.split(" ");
+
+                        System.out.println(ys1);
+                        for (int i = 0; i < lis1.length; i++) {
+                            os.write((byte)Integer.parseInt(lis1[i],16));
+                        }
+
+                        //生成2组
+                        String ys2 = GenerateYxStatus.getMinuatesData2();
+
+                        String[] lis2 = ys2.split(" ");
+
+                        System.out.println(ys2);
+                        for (int i = 0; i < lis2.length; i++) {
+                            os.write((byte)Integer.parseInt(lis2[i],16));
+                        }
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -156,7 +175,7 @@ public class ServerTest {
             };
             ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
             // 第二个参数为首次执行的延时时间，第三个参数为定时执行的间隔时间
-            service.scheduleAtFixedRate(runnable, 0, 30, TimeUnit.SECONDS);
+            service.scheduleAtFixedRate(runnable, 0, 20, TimeUnit.SECONDS);
 
             /*// 如果该字符串为 "bye"，则停止循环
             String line = is.readLine();

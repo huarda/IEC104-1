@@ -133,6 +133,7 @@ public class Client {
                                         //遍历数据池中所有遥信状态对象
                                         for (Map.Entry<String, YxStatusObject> entry : DataProcessPool.yxsPool.entrySet()) {
 
+                                            yxsObjName = null;
                                             //判断地址，确认通讯状态属于哪些逆变器
                                             if (address == 352){
                                                 if ("NO101".equals(entry.getKey()) || "NO102".equals(entry.getKey())){//101栋
@@ -233,19 +234,21 @@ public class Client {
                                         }
                                     }
                                     if(ycObjName != null){
-                                        log.debug("遥测对象 ："+ ycObjName +" ,信息体地址："+ address +"执行方法：set" + ycObjJson.getString("name") +"，值：" + ((IeShortFloat)infoObjs[i].getInformationElements()[j][0]).getValue());
+                                        log.debug("遥测对象 ："+ ycObjName +" ,信息体地址："+ address +"，执行方法：set" + ycObjJson.getString("name") +"，值：" + ((IeShortFloat)infoObjs[i].getInformationElements()[j][0]).getValue());
                                         //往YcObject对象中的属性set值
-                                        setValue(2,ycObjName,"set" + ycObjJson.getString("name"),((IeShortFloat)infoObjs[i].getInformationElements()[j][0]).getValue(),ycObjJson.getString("type"));
 
                                         //判断是否是遥信状态数据(并网、PV连接、警告状态)，是：将值set进遥信状态对象(YxStatusObject)对应的属性中
                                         if ("CONNECT_STATUS".equals(ycObjJson.getString("name"))){
-                                            setValue(3,ycObjName,"set" + ycObjJson.getString("name"),((IeShortFloat)infoObjs[i].getInformationElements()[j][0]).getValue(),ycObjJson.getString("type"));
+                                            setValue(2,ycObjName,"set" + ycObjJson.getString("name"),(int)((IeShortFloat)infoObjs[i].getInformationElements()[j][0]).getValue(),ycObjJson.getString("type"));
+                                            setValue(3,ycObjName,"set" + ycObjJson.getString("name"),(int)((IeShortFloat)infoObjs[i].getInformationElements()[j][0]).getValue(),ycObjJson.getString("type"));
                                         }else if("PV_CONNECT_STATUS".equals(ycObjJson.getString("name"))){
-                                            setValue(3,ycObjName,"set" + ycObjJson.getString("name"),((IeShortFloat)infoObjs[i].getInformationElements()[j][0]).getValue(),ycObjJson.getString("type"));
+                                            setValue(2,ycObjName,"set" + ycObjJson.getString("name"),(int)((IeShortFloat)infoObjs[i].getInformationElements()[j][0]).getValue(),ycObjJson.getString("type"));
+                                            setValue(3,ycObjName,"set" + ycObjJson.getString("name"),(int)((IeShortFloat)infoObjs[i].getInformationElements()[j][0]).getValue(),ycObjJson.getString("type"));
                                         }else if("WARNING_STATUS".equals(ycObjJson.getString("name"))){
-                                            setValue(3,ycObjName,"set" + ycObjJson.getString("name"),((IeShortFloat)infoObjs[i].getInformationElements()[j][0]).getValue(),ycObjJson.getString("type"));
+                                            setValue(2,ycObjName,"set" + ycObjJson.getString("name"),(int)((IeShortFloat)infoObjs[i].getInformationElements()[j][0]).getValue(),ycObjJson.getString("type"));
+                                            setValue(3,ycObjName,"set" + ycObjJson.getString("name"),(int)((IeShortFloat)infoObjs[i].getInformationElements()[j][0]).getValue(),ycObjJson.getString("type"));
                                         }else {
-                                            log.debug("非遥信状态数据");
+                                            setValue(2,ycObjName,"set" + ycObjJson.getString("name"),((IeShortFloat)infoObjs[i].getInformationElements()[j][0]).getValue(),ycObjJson.getString("type"));
                                         }
                                     }else{
                                         log.warn("遥测对象无名称！");
