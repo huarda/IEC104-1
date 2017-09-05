@@ -2,3 +2,4 @@
 .idea
 IEC104.iml
 target
+logs/
