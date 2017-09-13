@@ -12,6 +12,7 @@ import java.net.Socket;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class Client {
     private static Log log = LogFactory.getLog(Client.class);
@@ -37,7 +38,7 @@ public class Client {
             };
             ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
             // 第二个参数为首次执行的延时时间，第三个参数为定时执行的间隔时间
-            //service.scheduleAtFixedRate(runnable, 0, 300, TimeUnit.SECONDS);
+            service.scheduleAtFixedRate(runnable, 0, 180, TimeUnit.SECONDS);
 
             // 由Socket对象得到输入流，并构造相应的BufferedReader对象
 			InputStream is = socket.getInputStream();
