@@ -20,18 +20,20 @@ public class Init {
     public static JSONObject ycJsonObj = null;
     public static JSONObject yxJsonObj = null;
 
-    static {
+    public static void  start(){
         initDb();
         initBusinessData();
         DataProcessPool.initPool();
     }
 
     public static void initDb(){
+        log.debug("建立数据库连接池，连接数量是10");
         SqlHelper.connPool = new DBConnectionPool(10);
     }
 
     public static void initBusinessData(){
         try {
+            log.debug("解析配置文件");
             typeIdProp = FileUtils.loadPropFile("typeId.properties");
             causeProp = FileUtils.loadPropFile("cause.properties");
             ycJsonObj = FileUtils.loadJsonFile("yc.json");

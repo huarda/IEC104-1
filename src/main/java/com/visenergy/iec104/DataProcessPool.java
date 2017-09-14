@@ -22,17 +22,17 @@ public class DataProcessPool {
 
 
     public static void initPool(){
+        log.debug("初始化对象池对象");
         DBConnection conn = SqlHelper.connPool.getConnection();
         try {
             //查询所有逆变器的序列号、ID、所属楼宇ID
             String sql = "SELECT A.INVERTER_ID,A.SERIAL,A.BUILDING_ID FROM T_PVMANAGE_INVERTER A";
             List<Map> list = SqlHelper.executeQuery(conn,CommandType.Text,sql);
             for (int i = 0; i< list.size();i++){
-               ycPool.put((String) list.get(i).get("SERIAL"),new YcObject((String) list.get(i).get("INVERTER_ID"),(String) list.get(i).get("SERIAL")));
-//               yxPool.put((String) list.get(i).get("SERIAL"),new YxObject((String) list.get(i).get("INVERTER_ID"),(String) list.get(i).get("BUILDING_ID")));
-               yxsPool.put((String) list.get(i).get("SERIAL"),new YxStatusObject((String) list.get(i).get("INVERTER_ID"),(String) list.get(i).get("SERIAL")));
+                log.debug("创建逆变器" + list.get(i).get("SERIAL") + "遥信、遥测对象。");
+                ycPool.put((String) list.get(i).get("SERIAL"),new YcObject((String) list.get(i).get("INVERTER_ID"),(String) list.get(i).get("SERIAL")));
+                yxsPool.put((String) list.get(i).get("SERIAL"),new YxStatusObject((String) list.get(i).get("INVERTER_ID"),(String) list.get(i).get("SERIAL")));
             }
-            System.out.println("1");
         } catch (Exception e) {
            e.printStackTrace();
         }

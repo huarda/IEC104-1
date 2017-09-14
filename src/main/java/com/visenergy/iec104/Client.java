@@ -20,9 +20,11 @@ public class Client {
 	public static void main(String args[]) {
 
 		try {
+            //系统初始化
+            Init.start();
 			// 向本机的4700端口发出客户请求
 			Socket socket = new Socket("192.168.100.110", 2405);
-			
+			log.debug("与192.168.100.110建立连接");
 			// 由Socket对象得到输出流，并构造PrintWriter对象
 			OutputStream os = socket.getOutputStream();
 
