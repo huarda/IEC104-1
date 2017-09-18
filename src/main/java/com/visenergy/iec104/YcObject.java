@@ -106,14 +106,14 @@ public class YcObject {
             public void run() {
                 if(flag==true){
                     //逆变器数据采集表(历史表)插入语句
-                    String sql = "INSERT INTO T_PVMANAGE_INVERTER_COLLECT(ID,INVERTER_ID,ELEC_PROD_HOUR,ELEC_PROD_DAILY," +
+                    String sql = "INSERT INTO T_PVMANAGE_INVERTER_COLLECT(INVERTER_ID,ELEC_PROD_HOUR,ELEC_PROD_DAILY," +
                             "ELEC_PROD_MONTH,ELEC_PROD_YEAR,ELEC_PROD_ALL,OUTPUT_P,CONNECT_P,PEAK_POWER,REACTIVE_P," +
                             "PV1_U,PV1_I,PV2_U,PV2_I,PV3_U,PV3_I,PV4_U,PV4_I,PV5_U,PV5_I,PV6_U,PV6_I,PV7_U,PV7_I,PV8_U,PV8_I," +
                             "AC_UA,AC_UB,AC_UC,AC_IA,AC_IB,AC_IC,MACHINE_TEMP,GRID_FRQ,CONVERT_EFF,CO2_CUTS," +
                             "COAL_SAVE,CONVERT_BENF,CONNECT_STATUS,PV_CONNECT_STATUS,WARNING_STATUS,AMBIENT_TEMP," +
                             "RADIANT_QUANTITY_1,IRRADIANCE_1,RADIANT_QUANTITY_2,IRRADIANCE_2,DAMPNESS,PRESSURE,WIND_SPEED,WIND_DIR," +
                             "FULL_HOURS_DAY,FULL_HOURS_MON,FULL_HOURS_YEAR,FULL_HOURS_ALL) " +
-                            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
                     //逆变器实时数据表更新语句
                     String inverter_data_now = "UPDATE T_PVMANAGE_INVERTER_COLLECT_C SET ELEC_PROD_HOUR=?,ELEC_PROD_DAILY=?," +
                             "ELEC_PROD_MONTH=?,ELEC_PROD_YEAR=?,ELEC_PROD_ALL=?,OUTPUT_P=?,CONNECT_P=?,PEAK_POWER=?," +
@@ -124,16 +124,15 @@ public class YcObject {
                             "FULL_HOURS_DAY=?,FULL_HOURS_MON=?,FULL_HOURS_YEAR=?,FULL_HOURS_ALL=?,TIME=? " +
                             "WHERE INVERTER_ID = ?";
                     //环境数据采集
-                    String metero_sql = "INSERT INTO T_PVMANAGE_METERO(METERO_ID,WIND_SPEED,WIND_DIREC,PANEL_TEMP,AMBIEN_TEMP,RADIANT_QUANTITY_1,IRRADIANCE_1," +
-                            "RADIANT_QUANTITY_2,IRRADIANCE_2,DAMPNESS,PRESSURE) VALUES(?,?,?,?,?,?,?,?,?,?,?)";
+                    String metero_sql = "INSERT INTO T_PVMANAGE_METERO(WIND_SPEED,WIND_DIREC,PANEL_TEMP,AMBIEN_TEMP,RADIANT_QUANTITY_1,IRRADIANCE_1," +
+                            "RADIANT_QUANTITY_2,IRRADIANCE_2,DAMPNESS,PRESSURE) VALUES(?,?,?,?,?,?,?,?,?,?)";
 
                     DBConnection conn = SqlHelper.connPool.getConnection();
-                    Parameter[] params = new Parameter[55];
+                    Parameter[] params = new Parameter[54];
                     Parameter[] params_new_data = new Parameter[52];
                     Parameter[] params_metero_data = new Parameter[11];
 
                     //逆变器数据采集历史表
-                    String id = UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
                     COAL_SAVE = ELEC_PROD_ALL*0.4;
                     CONVERT_BENF = (0.42+0.3)*ELEC_PROD_YEAR;
                     if ("1820FB1857737B3BA33A8FEE25164C98".equals(inverterId) || "4D5F552ED8CC4EE981720CBDDB7FEAC6".equals(inverterId)){
@@ -179,130 +178,126 @@ public class YcObject {
                         FULL_HOURS_ALL = ELEC_PROD_ALL/16.2;
                     }
 
-                    params[0] = new Parameter("ID", BaseTypes.VARCHAR,id);
-                    params[1] = new Parameter("INVERTER_ID", BaseTypes.VARCHAR,INVERTER_ID);
-                    params[2] = new Parameter("ELEC_PROD_HOUR", BaseTypes.DECIMAL,new BigDecimal(ELEC_PROD_HOUR).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-                    params[3] = new Parameter("ELEC_PROD_DAILY", BaseTypes.DECIMAL,new BigDecimal(ELEC_PROD_DAILY).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-                    params[4] = new Parameter("ELEC_PROD_MONTH", BaseTypes.DECIMAL,new BigDecimal(ELEC_PROD_MONTH).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-                    params[5] = new Parameter("ELEC_PROD_YEAR", BaseTypes.DECIMAL,new BigDecimal(ELEC_PROD_YEAR).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-                    params[6] = new Parameter("ELEC_PROD_ALL", BaseTypes.DECIMAL,new BigDecimal(ELEC_PROD_ALL).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-                    params[7] = new Parameter("OUTPUT_P", BaseTypes.DECIMAL,new BigDecimal(OUTPUT_P).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-                    params[8] = new Parameter("CONNECT_P", BaseTypes.DECIMAL,new BigDecimal(CONNECT_P).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-                    params[9] = new Parameter("PEAK_POWER", BaseTypes.DECIMAL,new BigDecimal(PEAK_POWER).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue() );
-                    params[10] = new Parameter("REACTIVE_P", BaseTypes.DECIMAL,new BigDecimal(REACTIVE_P).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-                    params[11] = new Parameter("PV1_U", BaseTypes.DECIMAL,new BigDecimal(PV1_U).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-                    params[12] = new Parameter("PV1_I", BaseTypes.DECIMAL,new BigDecimal(PV1_I).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-                    params[13] = new Parameter("PV2_U", BaseTypes.DECIMAL,new BigDecimal(PV2_U).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-                    params[14] = new Parameter("PV2_I", BaseTypes.DECIMAL,new BigDecimal(PV2_I).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-                    params[15] = new Parameter("PV3_U", BaseTypes.DECIMAL,new BigDecimal(PV3_U).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-                    params[16] = new Parameter("PV3_I", BaseTypes.DECIMAL,new BigDecimal(PV3_I).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-                    params[17] = new Parameter("PV4_U", BaseTypes.DECIMAL,new BigDecimal(PV4_U).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-                    params[18] = new Parameter("PV4_I", BaseTypes.DECIMAL,new BigDecimal(PV4_I).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-                    params[19] = new Parameter("PV5_U", BaseTypes.DECIMAL,new BigDecimal(PV5_U).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-                    params[20] = new Parameter("PV5_I", BaseTypes.DECIMAL,new BigDecimal(PV5_I).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-                    params[21] = new Parameter("PV6_U", BaseTypes.DECIMAL,new BigDecimal(PV6_U).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-                    params[22] = new Parameter("PV6_I", BaseTypes.DECIMAL,new BigDecimal(PV6_I).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-                    params[23] = new Parameter("PV7_U", BaseTypes.DECIMAL,new BigDecimal(PV7_U).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-                    params[24] = new Parameter("PV7_I", BaseTypes.DECIMAL,new BigDecimal(PV7_I).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-                    params[25] = new Parameter("PV8_U", BaseTypes.DECIMAL,new BigDecimal(PV8_U).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-                    params[26] = new Parameter("PV8_I", BaseTypes.DECIMAL,new BigDecimal(PV8_I).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-                    params[27] = new Parameter("AC_UA", BaseTypes.DECIMAL,new BigDecimal(AC_UA).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-                    params[28] = new Parameter("AC_UB", BaseTypes.DECIMAL,new BigDecimal(AC_UB).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-                    params[29] = new Parameter("AC_UC", BaseTypes.DECIMAL,new BigDecimal(AC_UC).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-                    params[30] = new Parameter("AC_IA", BaseTypes.DECIMAL,new BigDecimal(AC_IA).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-                    params[31] = new Parameter("AC_IB", BaseTypes.DECIMAL,new BigDecimal(AC_IB).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-                    params[32] = new Parameter("AC_IC", BaseTypes.DECIMAL,new BigDecimal(AC_IC).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-                    params[33] = new Parameter("MACHINE_TEMP",BaseTypes.DECIMAL, new BigDecimal(MACHINE_TEMP).setScale(1,BigDecimal.ROUND_HALF_UP).doubleValue());
-                    params[34] = new Parameter("GRID_FRQ", BaseTypes.DECIMAL,new BigDecimal(GRID_FRQ).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-                    params[35] = new Parameter("CONVERT_EFF", BaseTypes.DECIMAL,new BigDecimal(CONVERT_EFF).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-                    params[36] = new Parameter("CO2_CUTS", BaseTypes.DECIMAL,new BigDecimal(CO2_CUTS).setScale(3,BigDecimal.ROUND_HALF_UP).doubleValue());
-                    params[37] = new Parameter("COAL_SAVE", BaseTypes.DECIMAL,new BigDecimal(COAL_SAVE).setScale(3,BigDecimal.ROUND_HALF_UP).doubleValue());
-                    params[38] = new Parameter("CONVERT_BENF", BaseTypes.DECIMAL,new BigDecimal(CONVERT_BENF).setScale(4,BigDecimal.ROUND_HALF_UP).doubleValue());
-                    params[39] = new Parameter("CONNECT_STATUS", BaseTypes.INTEGER,CONNECT_STATUS);
-                    params[40] = new Parameter("PV_CONNECT_STATUS", BaseTypes.INTEGER,PV_CONNECT_STATUS);
-                    params[41] = new Parameter("WARNING_STATUS", BaseTypes.INTEGER,WARNING_STATUS);
-                    params[42] = new Parameter("AMBIENT_TEMP",BaseTypes.DECIMAL,new BigDecimal(AMBIENT_TEMP).setScale(1,BigDecimal.ROUND_HALF_UP).doubleValue() );
-                    params[43] = new Parameter("RADIANT_QUANTITY_1", BaseTypes.DECIMAL,new BigDecimal(RADIANT_QUANTITY_1).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-                    params[44] = new Parameter("IRRADIANCE_1",BaseTypes.DECIMAL,new BigDecimal(IRRADIANCE_1).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue() );
-                    params[45] = new Parameter("RADIANT_QUANTITY_2", BaseTypes.DECIMAL,new BigDecimal(RADIANT_QUANTITY_2).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-                    params[46] = new Parameter("IRRADIANCE_2",BaseTypes.DECIMAL,new BigDecimal(IRRADIANCE_1).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue() );
-                    params[47] = new Parameter("DAMPNESS",BaseTypes.DECIMAL,new BigDecimal(DAMPNESS).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-                    params[48] = new Parameter("PRESSURE",BaseTypes.DECIMAL,new BigDecimal(PRESSURE).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-                    params[49] = new Parameter("WIND_SPEED",BaseTypes.DECIMAL,new BigDecimal(WIND_SPEED).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-                    params[50] = new Parameter("WIND_DIR",BaseTypes.DECIMAL,new BigDecimal(WIND_DIR).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-                    params[51] = new Parameter("FULL_HOURS_DAY",BaseTypes.DECIMAL,new BigDecimal(FULL_HOURS_DAY).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-                    params[52] = new Parameter("FULL_HOURS_MON",BaseTypes.DECIMAL,new BigDecimal(FULL_HOURS_MON).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-                    params[53] = new Parameter("FULL_HOURS_YEAR",BaseTypes.DECIMAL,new BigDecimal(FULL_HOURS_YEAR).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-                    params[54] = new Parameter("FULL_HOURS_ALL",BaseTypes.DECIMAL,new BigDecimal(FULL_HOURS_ALL).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
-
+                    params[0] = new Parameter("INVERTER_ID", BaseTypes.VARCHAR,INVERTER_ID);
+                    params[1] = new Parameter("ELEC_PROD_HOUR", BaseTypes.DECIMAL,new BigDecimal(ELEC_PROD_HOUR).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[2] = new Parameter("ELEC_PROD_DAILY", BaseTypes.DECIMAL,new BigDecimal(ELEC_PROD_DAILY).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[3] = new Parameter("ELEC_PROD_MONTH", BaseTypes.DECIMAL,new BigDecimal(ELEC_PROD_MONTH).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[4] = new Parameter("ELEC_PROD_YEAR", BaseTypes.DECIMAL,new BigDecimal(ELEC_PROD_YEAR).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[5] = new Parameter("ELEC_PROD_ALL", BaseTypes.DECIMAL,new BigDecimal(ELEC_PROD_ALL).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[6] = new Parameter("OUTPUT_P", BaseTypes.DECIMAL,new BigDecimal(OUTPUT_P).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[7] = new Parameter("CONNECT_P", BaseTypes.DECIMAL,new BigDecimal(CONNECT_P).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[8] = new Parameter("PEAK_POWER", BaseTypes.DECIMAL,new BigDecimal(PEAK_POWER).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue() );
+                    params[9] = new Parameter("REACTIVE_P", BaseTypes.DECIMAL,new BigDecimal(REACTIVE_P).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[10] = new Parameter("PV1_U", BaseTypes.DECIMAL,new BigDecimal(PV1_U).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[11] = new Parameter("PV1_I", BaseTypes.DECIMAL,new BigDecimal(PV1_I).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[12] = new Parameter("PV2_U", BaseTypes.DECIMAL,new BigDecimal(PV2_U).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[13] = new Parameter("PV2_I", BaseTypes.DECIMAL,new BigDecimal(PV2_I).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[14] = new Parameter("PV3_U", BaseTypes.DECIMAL,new BigDecimal(PV3_U).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[15] = new Parameter("PV3_I", BaseTypes.DECIMAL,new BigDecimal(PV3_I).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[16] = new Parameter("PV4_U", BaseTypes.DECIMAL,new BigDecimal(PV4_U).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[17] = new Parameter("PV4_I", BaseTypes.DECIMAL,new BigDecimal(PV4_I).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[18] = new Parameter("PV5_U", BaseTypes.DECIMAL,new BigDecimal(PV5_U).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[19] = new Parameter("PV5_I", BaseTypes.DECIMAL,new BigDecimal(PV5_I).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[20] = new Parameter("PV6_U", BaseTypes.DECIMAL,new BigDecimal(PV6_U).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[21] = new Parameter("PV6_I", BaseTypes.DECIMAL,new BigDecimal(PV6_I).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[22] = new Parameter("PV7_U", BaseTypes.DECIMAL,new BigDecimal(PV7_U).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[23] = new Parameter("PV7_I", BaseTypes.DECIMAL,new BigDecimal(PV7_I).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[24] = new Parameter("PV8_U", BaseTypes.DECIMAL,new BigDecimal(PV8_U).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[25] = new Parameter("PV8_I", BaseTypes.DECIMAL,new BigDecimal(PV8_I).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[26] = new Parameter("AC_UA", BaseTypes.DECIMAL,new BigDecimal(AC_UA).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[27] = new Parameter("AC_UB", BaseTypes.DECIMAL,new BigDecimal(AC_UB).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[28] = new Parameter("AC_UC", BaseTypes.DECIMAL,new BigDecimal(AC_UC).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[29] = new Parameter("AC_IA", BaseTypes.DECIMAL,new BigDecimal(AC_IA).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[30] = new Parameter("AC_IB", BaseTypes.DECIMAL,new BigDecimal(AC_IB).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[31] = new Parameter("AC_IC", BaseTypes.DECIMAL,new BigDecimal(AC_IC).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[32] = new Parameter("MACHINE_TEMP",BaseTypes.DECIMAL, new BigDecimal(MACHINE_TEMP).setScale(1,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[33] = new Parameter("GRID_FRQ", BaseTypes.DECIMAL,new BigDecimal(GRID_FRQ).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[34] = new Parameter("CONVERT_EFF", BaseTypes.DECIMAL,new BigDecimal(CONVERT_EFF).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[35] = new Parameter("CO2_CUTS", BaseTypes.DECIMAL,new BigDecimal(CO2_CUTS).setScale(3,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[36] = new Parameter("COAL_SAVE", BaseTypes.DECIMAL,new BigDecimal(COAL_SAVE).setScale(3,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[37] = new Parameter("CONVERT_BENF", BaseTypes.DECIMAL,new BigDecimal(CONVERT_BENF).setScale(4,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[38] = new Parameter("CONNECT_STATUS", BaseTypes.INTEGER,CONNECT_STATUS);
+                    params[39] = new Parameter("PV_CONNECT_STATUS", BaseTypes.INTEGER,PV_CONNECT_STATUS);
+                    params[40] = new Parameter("WARNING_STATUS", BaseTypes.INTEGER,WARNING_STATUS);
+                    params[41] = new Parameter("AMBIENT_TEMP",BaseTypes.DECIMAL,new BigDecimal(AMBIENT_TEMP).setScale(1,BigDecimal.ROUND_HALF_UP).doubleValue() );
+                    params[42] = new Parameter("RADIANT_QUANTITY_1", BaseTypes.DECIMAL,new BigDecimal(RADIANT_QUANTITY_1).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[43] = new Parameter("IRRADIANCE_1",BaseTypes.DECIMAL,new BigDecimal(IRRADIANCE_1).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue() );
+                    params[44] = new Parameter("RADIANT_QUANTITY_2", BaseTypes.DECIMAL,new BigDecimal(RADIANT_QUANTITY_2).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[45] = new Parameter("IRRADIANCE_2",BaseTypes.DECIMAL,new BigDecimal(IRRADIANCE_1).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue() );
+                    params[46] = new Parameter("DAMPNESS",BaseTypes.DECIMAL,new BigDecimal(DAMPNESS).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[47] = new Parameter("PRESSURE",BaseTypes.DECIMAL,new BigDecimal(PRESSURE).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[48] = new Parameter("WIND_SPEED",BaseTypes.DECIMAL,new BigDecimal(WIND_SPEED).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[49] = new Parameter("WIND_DIR",BaseTypes.DECIMAL,new BigDecimal(WIND_DIR).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[50] = new Parameter("FULL_HOURS_DAY",BaseTypes.DECIMAL,new BigDecimal(FULL_HOURS_DAY).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[51] = new Parameter("FULL_HOURS_MON",BaseTypes.DECIMAL,new BigDecimal(FULL_HOURS_MON).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[52] = new Parameter("FULL_HOURS_YEAR",BaseTypes.DECIMAL,new BigDecimal(FULL_HOURS_YEAR).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
+                    params[53] = new Parameter("FULL_HOURS_ALL",BaseTypes.DECIMAL,new BigDecimal(FULL_HOURS_ALL).setScale(2,BigDecimal.ROUND_HALF_UP).doubleValue());
 
                     //将数据存入逆变器实时数据表
-                    params_new_data[0] = params[2];
-                    params_new_data[1] = params[3];
-                    params_new_data[2] = params[4];
-                    params_new_data[3] = params[5];
-                    params_new_data[4] = params[6];
-                    params_new_data[5] = params[7];
-                    params_new_data[6] = params[8];
-                    params_new_data[7] = params[9];
-                    params_new_data[8] = params[10];
-                    params_new_data[9] = params[11];
-                    params_new_data[10] = params[12];
-                    params_new_data[11] = params[13];
-                    params_new_data[12] = params[14];
-                    params_new_data[13] = params[15];
-                    params_new_data[14] = params[16];
-                    params_new_data[15] = params[17];
-                    params_new_data[16] = params[18];
-                    params_new_data[17] = params[19];
-                    params_new_data[18] = params[20];
-                    params_new_data[19] = params[21];
-                    params_new_data[20] = params[22];
-                    params_new_data[21] = params[23];
-                    params_new_data[22] = params[24];
-                    params_new_data[23] = params[25];
-                    params_new_data[24] = params[26];
-                    params_new_data[25] = params[27];
-                    params_new_data[26] = params[28];
-                    params_new_data[27] = params[29];
-                    params_new_data[28] = params[30];
-                    params_new_data[29] = params[31];
-                    params_new_data[30] = params[32];
-                    params_new_data[31] = params[33];
-                    params_new_data[32] = params[34];
-                    params_new_data[33] = params[35];
-                    params_new_data[34] = params[36];
-                    params_new_data[35] = params[37];
-                    params_new_data[36] = params[38];
-                    params_new_data[37] = params[42];
-                    params_new_data[38] = params[43];
-                    params_new_data[39] = params[44];
-                    params_new_data[40] = params[45];
-                    params_new_data[41] = params[46];
-                    params_new_data[42] = params[47];
-                    params_new_data[43] = params[48];
-                    params_new_data[44] = params[49];
-                    params_new_data[45] = params[50];
-                    params_new_data[46] = params[51];
-                    params_new_data[47] = params[52];
-                    params_new_data[48] = params[53];
-                    params_new_data[49] = params[54];
+                    params_new_data[0]  = params[1];
+                    params_new_data[1]  = params[2];
+                    params_new_data[2]  = params[3];
+                    params_new_data[3]  = params[4];
+                    params_new_data[4]  = params[5];
+                    params_new_data[5]  = params[6];
+                    params_new_data[6]  = params[7];
+                    params_new_data[7]  = params[8];
+                    params_new_data[8]  = params[9];
+                    params_new_data[9]  = params[10];
+                    params_new_data[10] = params[11];
+                    params_new_data[11] = params[12];
+                    params_new_data[12] = params[13];
+                    params_new_data[13] = params[14];
+                    params_new_data[14] = params[15];
+                    params_new_data[15] = params[16];
+                    params_new_data[16] = params[17];
+                    params_new_data[17] = params[18];
+                    params_new_data[18] = params[19];
+                    params_new_data[19] = params[20];
+                    params_new_data[20] = params[21];
+                    params_new_data[21] = params[22];
+                    params_new_data[22] = params[23];
+                    params_new_data[23] = params[24];
+                    params_new_data[24] = params[25];
+                    params_new_data[25] = params[26];
+                    params_new_data[26] = params[27];
+                    params_new_data[27] = params[28];
+                    params_new_data[28] = params[29];
+                    params_new_data[29] = params[30];
+                    params_new_data[30] = params[31];
+                    params_new_data[31] = params[32];
+                    params_new_data[32] = params[33];
+                    params_new_data[33] = params[34];
+                    params_new_data[34] = params[35];
+                    params_new_data[35] = params[36];
+                    params_new_data[36] = params[37];
+                    params_new_data[37] = params[38];
+                    params_new_data[38] = params[42];
+                    params_new_data[39] = params[43];
+                    params_new_data[40] = params[44];
+                    params_new_data[41] = params[45];
+                    params_new_data[42] = params[46];
+                    params_new_data[43] = params[47];
+                    params_new_data[44] = params[48];
+                    params_new_data[45] = params[49];
+                    params_new_data[46] = params[50];
+                    params_new_data[47] = params[51];
+                    params_new_data[48] = params[52];
+                    params_new_data[49] = params[53];
                     params_new_data[50] = new Parameter("TIME", BaseTypes.TIMESTAMP,new Timestamp(System.currentTimeMillis()));
-                    params_new_data[51] = params[1];
+                    params_new_data[51] = params[0];
 
                     //气象数据
-                    String meteroId = UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
-                    params_metero_data[0] = new Parameter("METERO_ID", BaseTypes.VARCHAR,meteroId);
+                    params_metero_data[0] = params[48];
                     params_metero_data[1] = params[49];
-                    params_metero_data[2] = params[50];
-                    params_metero_data[3] = params[33];
+                    params_metero_data[2] = params[32];
+                    params_metero_data[3] = params[41];
                     params_metero_data[4] = params[42];
                     params_metero_data[5] = params[43];
                     params_metero_data[6] = params[44];
                     params_metero_data[7] = params[45];
                     params_metero_data[8] = params[46];
                     params_metero_data[9] = params[47];
-                    params_metero_data[10] = params[48];
 
                     try {
                         SqlHelper.executeNonQuery(conn, CommandType.Text, sql, params);
