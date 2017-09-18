@@ -1,6 +1,8 @@
 package com.visenergy.iec104;
 
+import com.rabbitmq.client.*;
 import com.visenergy.iec104.util.ChangeUtils;
+import com.visenergy.iec104.util.RabbitMqUtils;
 import net.sf.json.JSONObject;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -41,6 +43,18 @@ public class Client {
             ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
             // 第二个参数为首次执行的延时时间，第三个参数为定时执行的间隔时间
             service.scheduleAtFixedRate(runnable, 60, 180, TimeUnit.SECONDS);
+
+            Connection conn = RabbitMqUtils.newConnection();
+            Channel channel = conn.createChannel();
+            //监听总召命令
+            Consumer consumer = new DefaultConsumer(channel){
+                @Override
+                public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
+                    log.debug("有新客户端连接，发送总召命令");
+                    os.write(ChangeUtils.hexStringToBytes("680E0000000064010600010000000014"));
+                }
+            };
+            channel.basicConsume("PV_CALL",true,consumer);
 
             // 由Socket对象得到输入流，并构造相应的BufferedReader对象
 			InputStream is = socket.getInputStream();
