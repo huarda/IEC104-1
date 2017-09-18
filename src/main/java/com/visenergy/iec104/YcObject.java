@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.*;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 
 /**
  * Created by zhonghuan on 2017/7/25.
@@ -320,6 +320,8 @@ public class YcObject {
                 }
             }
         };
+        ScheduledExecutorService service  = Executors.newSingleThreadScheduledExecutor();
+        service.scheduleAtFixedRate(runnable,120,300, TimeUnit.SECONDS);
     }
 
     public void clear(){
