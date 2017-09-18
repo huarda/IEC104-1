@@ -130,7 +130,7 @@ public class YcObject {
                     DBConnection conn = SqlHelper.connPool.getConnection();
                     Parameter[] params = new Parameter[54];
                     Parameter[] params_new_data = new Parameter[52];
-                    Parameter[] params_metero_data = new Parameter[11];
+                    Parameter[] params_metero_data = new Parameter[10];
 
                     //逆变器数据采集历史表
                     COAL_SAVE = ELEC_PROD_ALL*0.4;
